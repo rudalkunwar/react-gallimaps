@@ -1,0 +1,241 @@
+/* GalliMaps React Components Default Styles */
+
+.gallimaps-autocomplete {
+  position: relative;
+  width: 100%;
+}
+
+.gallimaps-autocomplete__input {
+  width: 100%;
+  padding: 12px 40px 12px 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+}
+
+.gallimaps-autocomplete__input:focus {
+  border-color: #4a90e2;
+  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+}
+
+.gallimaps-autocomplete__input--error {
+  border-color: #e74c3c;
+}
+
+.gallimaps-autocomplete__input:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.gallimaps-autocomplete__clear {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  color: #666;
+  font-size: 18px;
+  line-height: 1;
+  transition: color 0.2s;
+}
+
+.gallimaps-autocomplete__clear:hover {
+  color: #333;
+}
+
+.gallimaps-autocomplete__loading {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #666;
+  font-size: 14px;
+}
+
+.gallimaps-autocomplete__error {
+  color: #e74c3c;
+  font-size: 14px;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.gallimaps-autocomplete__location-warning {
+  color: #f39c12;
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+.gallimaps-autocomplete__dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  max-height: 300px;
+  overflow-y: auto;
+  margin-top: 4px;
+}
+
+.gallimaps-autocomplete__option {
+  padding: 12px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background-color 0.2s;
+}
+
+.gallimaps-autocomplete__option:last-child {
+  border-bottom: none;
+}
+
+.gallimaps-autocomplete__option:hover,
+.gallimaps-autocomplete__option--selected {
+  background-color: #f8f9fa;
+}
+
+.gallimaps-autocomplete__option-title {
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.gallimaps-autocomplete__option-location {
+  font-size: 14px;
+  color: #666;
+}
+
+.gallimaps-autocomplete__option-distance {
+  font-size: 12px;
+  color: #999;
+}
+
+/* Search Input Styles */
+.gallimaps-search {
+  position: relative;
+  width: 100%;
+}
+
+.gallimaps-search__input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+}
+
+.gallimaps-search__input:focus {
+  border-color: #4a90e2;
+  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+}
+
+.gallimaps-search__input--error {
+  border-color: #e74c3c;
+}
+
+/* Map Component Styles */
+.gallimaps-map {
+  width: 100%;
+  height: 400px;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+}
+
+.gallimaps-map__container {
+  width: 100%;
+  height: 100%;
+}
+
+.gallimaps-map__loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background-color: #f5f5f5;
+  color: #666;
+  font-size: 16px;
+}
+
+.gallimaps-map__error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background-color: #fff5f5;
+  color: #e74c3c;
+  font-size: 16px;
+  text-align: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* Dark theme support */
+@media (prefers-color-scheme: dark) {
+  .gallimaps-autocomplete__input,
+  .gallimaps-search__input {
+    background-color: #2d3748;
+    border-color: #4a5568;
+    color: #e2e8f0;
+  }
+
+  .gallimaps-autocomplete__dropdown {
+    background-color: #2d3748;
+    border-color: #4a5568;
+  }
+
+  .gallimaps-autocomplete__option {
+    border-bottom-color: #4a5568;
+  }
+
+  .gallimaps-autocomplete__option:hover,
+  .gallimaps-autocomplete__option--selected {
+    background-color: #4a5568;
+  }
+
+  .gallimaps-autocomplete__option-location {
+    color: #a0aec0;
+  }
+
+  .gallimaps-autocomplete__option-distance {
+    color: #718096;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .gallimaps-autocomplete__input,
+  .gallimaps-search__input {
+    border-width: 2px;
+  }
+
+  .gallimaps-autocomplete__input:focus,
+  .gallimaps-search__input:focus {
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.4);
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .gallimaps-autocomplete__input,
+  .gallimaps-search__input,
+  .gallimaps-autocomplete__clear,
+  .gallimaps-autocomplete__option {
+    transition: none;
+  }
+}
