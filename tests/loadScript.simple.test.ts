@@ -14,42 +14,30 @@ describe("loadScript Utility", () => {
   });
 
   it("creates script element and resolves on load", async () => {
-    // Mock document.createElement to return a script element
-    const mockScript = {
-      src: "",
-      async: false,
-      onload: null as (() => void) | null,
-      onerror: null as (() => void) | null,
-    };
-
-    const originalCreateElement = document.createElement;
-    const mockAppendChild = jest.fn();
-
-    document.createElement = jest.fn().mockImplementation((tagName) => {
-      if (tagName === "script") {
-        return mockScript;
-      }
-      return originalCreateElement.call(document, tagName);
-    });
-
-    document.head.appendChild = mockAppendChild;
-
     const scriptUrl = "https://example.com/script.js";
+    const mockScript = document.createElement('script');
+    
+    // Mock document.createElement
+    const createElementSpy = jest.spyOn(document, 'createElement').mockReturnValue(mockScript);
+    const appendChildSpy = jest.spyOn(document.head, 'appendChild').mockImplementation(() => mockScript);
+    
     const loadPromise = loadScript(scriptUrl);
 
     // Verify script properties are set
+    expect(createElementSpy).toHaveBeenCalledWith('script');
     expect(mockScript.src).toBe(scriptUrl);
     expect(mockScript.async).toBe(true);
+    expect(appendChildSpy).toHaveBeenCalledWith(mockScript);
 
     // Simulate successful load
     if (mockScript.onload) {
-      mockScript.onload();
+      mockScript.onload(new Event('load'));
     }
 
     await expect(loadPromise).resolves.toBeUndefined();
-    expect(mockAppendChild).toHaveBeenCalledWith(mockScript);
 
     // Cleanup
-    document.createElement = originalCreateElement;
+    createElementSpy.mockRestore();
+    appendChildSpy.mockRestore();
   });
 });
