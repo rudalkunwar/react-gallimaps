@@ -18,9 +18,33 @@ interface GalliMapProps {
     onMapError?: (error: Error) => void;
 }
 
+/** Pre-defined styles to prevent object recreation on re-renders */
+const DEFAULT_STYLE = { width: '100%', height: '400px' };
+const ERROR_STYLE = {
+    color: '#dc3545',
+    padding: '20px',
+    textAlign: 'center' as const,
+    backgroundColor: '#f8d7da',
+    border: '1px solid #f5c6cb',
+    borderRadius: '4px',
+    margin: '10px 0'
+};
+const LOADING_STYLE = {
+    padding: '20px',
+    textAlign: 'center' as const,
+    backgroundColor: '#f8f9fa',
+    border: '1px solid #dee2e6',
+    borderRadius: '4px',
+    margin: '10px 0'
+};
+
+/**
+ * React component for rendering GalliMaps with full TypeScript support
+ * Handles script loading, map initialization, and provides imperative API
+ */
 const GalliMap = forwardRef<GalliMapRef, GalliMapProps>(({
     options,
-    style = { width: '100%', height: '400px' },
+    style = DEFAULT_STYLE,
     className,
     panoStyle,
     panoClassName,
@@ -33,6 +57,7 @@ const GalliMap = forwardRef<GalliMapRef, GalliMapProps>(({
     const [error, setError] = useState<Error | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
+    /** Expose map methods through ref for imperative access */
     useImperativeHandle(ref, () => ({
         displayPinMarker: (markerOptions) => mapInstanceRef.current?.displayPinMarker(markerOptions),
         removePinMarker: (marker) => mapInstanceRef.current?.removePinMarker(marker),
@@ -41,7 +66,7 @@ const GalliMap = forwardRef<GalliMapRef, GalliMapProps>(({
         drawPolygon: (polygonOptions) => mapInstanceRef.current?.drawPolygon(polygonOptions),
         removePolygon: (name) => mapInstanceRef.current?.removePolygon(name),
         getMapInstance: () => mapInstanceRef.current,
-    }));
+    }), []);
 
     useEffect(() => {
         const initializeMap = async () => {
@@ -49,8 +74,9 @@ const GalliMap = forwardRef<GalliMapRef, GalliMapProps>(({
                 setIsLoading(true);
                 setError(null);
 
-                await loadScript('https://gallimap.com/static/dist/js/gallimaps.vector.min.latest.js');
+                await loadScript();
 
+                /** Generate unique container IDs to prevent conflicts */
                 const mapId = `gallimaps-${Date.now()}`;
                 const panoId = `gallipano-${Date.now()}`;
 
@@ -87,18 +113,7 @@ const GalliMap = forwardRef<GalliMapRef, GalliMapProps>(({
 
     if (error) {
         return (
-            <div 
-                style={{ 
-                    color: '#dc3545', 
-                    padding: '20px', 
-                    textAlign: 'center',
-                    backgroundColor: '#f8d7da',
-                    border: '1px solid #f5c6cb',
-                    borderRadius: '4px',
-                    margin: '10px 0'
-                }}
-                data-testid="gallimap-error"
-            >
+            <div style={ERROR_STYLE} data-testid="gallimap-error">
                 <strong>Error loading map:</strong> {error.message}
             </div>
         );
@@ -106,17 +121,7 @@ const GalliMap = forwardRef<GalliMapRef, GalliMapProps>(({
 
     if (isLoading) {
         return (
-            <div 
-                style={{ 
-                    padding: '20px', 
-                    textAlign: 'center',
-                    backgroundColor: '#f8f9fa',
-                    border: '1px solid #dee2e6',
-                    borderRadius: '4px',
-                    margin: '10px 0'
-                }}
-                data-testid="gallimap-loading"
-            >
+            <div style={LOADING_STYLE} data-testid="gallimap-loading">
                 Loading GalliMaps...
             </div>
         );

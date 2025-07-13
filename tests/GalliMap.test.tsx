@@ -3,6 +3,27 @@ import { render } from '@testing-library/react';
 import GalliMap from '../src/components/GalliMap';
 
 describe('GalliMap Component', () => {
+  beforeEach(() => {
+    // Mock GalliMapPlugin for component tests
+    Object.defineProperty(window, "GalliMapPlugin", {
+      value: jest.fn().mockImplementation((options) => ({
+        displayPinMarker: jest.fn(),
+        removePinMarker: jest.fn(),
+        autoCompleteSearch: jest.fn().mockResolvedValue([]),
+        searchData: jest.fn(),
+        drawPolygon: jest.fn(),
+        removePolygon: jest.fn(),
+        options,
+      })),
+      writable: true,
+      configurable: true,
+    });
+  });
+
+  afterEach(() => {
+    delete (window as any).GalliMapPlugin;
+  });
+
   it('should render with minimal props', () => {
     const options = {
       accessToken: 'test-token',
@@ -31,7 +52,7 @@ describe('GalliMap Component', () => {
     const { container } = render(
       <GalliMap options={options} style={customStyle} />
     );
-    
+
     const mapContainer = container.firstChild as HTMLElement;
     expect(mapContainer).toBeTruthy();
   });

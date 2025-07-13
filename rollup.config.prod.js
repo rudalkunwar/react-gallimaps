@@ -3,7 +3,8 @@ import commonjs from "@rollup/plugin-commonjs";
 import typescript from "@rollup/plugin-typescript";
 import terser from "@rollup/plugin-terser";
 
-/** Development build configuration with source maps */
+const isProduction = process.env.NODE_ENV === "production";
+
 export default {
   input: "src/index.tsx",
   output: [
@@ -11,7 +12,7 @@ export default {
       file: "dist/index.cjs.js",
       format: "cjs",
       exports: "named",
-      sourcemap: true,
+      sourcemap: !isProduction,
       globals: {
         react: "React",
         "react-dom": "ReactDOM",
@@ -21,10 +22,9 @@ export default {
     {
       file: "dist/index.esm.js",
       format: "esm",
-      sourcemap: true,
+      sourcemap: !isProduction,
     },
   ],
-  /** Externalize React dependencies to prevent bundling */
   external: (id) => {
     return (
       id === "react" ||
@@ -45,14 +45,17 @@ export default {
       tsconfig: "./tsconfig.json",
       exclude: ["**/*.test.*", "tests/**/*"],
       declaration: true,
-      declarationMap: true,
+      declarationMap: !isProduction,
     }),
     terser({
       compress: {
-        drop_console: false,
+        drop_console: isProduction,
         drop_debugger: true,
-        pure_funcs: ["console.log"],
-        passes: 2,
+        pure_funcs: isProduction ? ["console.log", "console.warn"] : [],
+        passes: isProduction ? 3 : 2,
+        unsafe: isProduction,
+        unsafe_comps: isProduction,
+        unsafe_math: isProduction,
       },
       mangle: {
         reserved: ["React", "ReactDOM"],

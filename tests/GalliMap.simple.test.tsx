@@ -9,6 +9,27 @@ jest.mock('../src/utils/loadScript', () => ({
 }));
 
 describe('GalliMap Component', () => {
+    beforeEach(() => {
+        // Mock GalliMapPlugin for component tests
+        Object.defineProperty(window, "GalliMapPlugin", {
+            value: jest.fn().mockImplementation((options) => ({
+                displayPinMarker: jest.fn(),
+                removePinMarker: jest.fn(),
+                autoCompleteSearch: jest.fn().mockResolvedValue([]),
+                searchData: jest.fn(),
+                drawPolygon: jest.fn(),
+                removePolygon: jest.fn(),
+                options,
+            })),
+            writable: true,
+            configurable: true,
+        });
+    });
+
+    afterEach(() => {
+        delete (window as any).GalliMapPlugin;
+    });
+
     const defaultOptions: GalliMapOptions = {
         accessToken: 'test-token',
         map: {

@@ -25,9 +25,6 @@ module.exports = {
       },
     ],
   },
-  moduleNameMapping: {
-    "^@/(.*)$": "<rootDir>/src/$1",
-  },
   testEnvironmentOptions: {
     customExportConditions: ["node", "node-addons"],
   },

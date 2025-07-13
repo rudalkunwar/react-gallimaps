@@ -28,6 +28,7 @@
   },
   "scripts": {
     "build": "rollup -c",
+    "build:prod": "cross-env NODE_ENV=production rollup -c rollup.config.prod.js",
     "dev": "rollup -c -w",
     "test": "jest --config jest.config.cjs",
     "test:watch": "jest --config jest.config.cjs --watch",
@@ -35,9 +36,9 @@
     "lint": "echo \"No linter configured yet\"",
     "type-check": "tsc --noEmit",
     "clean": "rimraf dist coverage",
-    "prepare": "npm run clean && npm run build",
-    "prepublishOnly": "npm run test:coverage && npm run type-check && npm run build",
-    "prepack": "npm run build"
+    "prepare": "npm run clean && npm run build:prod",
+    "prepublishOnly": "npm run test:coverage && npm run type-check && npm run build:prod",
+    "prepack": "npm run build:prod"
   },
   "keywords": [
     "react",
@@ -75,6 +76,7 @@
     "@types/jest": "^29.5.14",
     "@types/react": "^18.2.48",
     "@types/react-dom": "^18.3.7",
+    "cross-env": "^7.0.3",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^30.0.4",
     "react": "^18.3.1",

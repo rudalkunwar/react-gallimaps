@@ -1,6 +1,11 @@
-import { useRef, useCallback } from 'react';
-import { GalliMapRef, PinMarkerOptions, PolygonOptions } from '../types';
+import { useRef, useCallback } from "react";
+import { GalliMapRef, PinMarkerOptions, PolygonOptions } from "../types";
 
+/**
+ * Custom hook for interacting with GalliMap component
+ * Provides memoized callbacks for common map operations
+ * @returns Object with mapRef and convenience methods
+ */
 export const useGalliMap = () => {
   const mapRef = useRef<GalliMapRef | null>(null);
 

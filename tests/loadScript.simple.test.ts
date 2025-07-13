@@ -15,23 +15,31 @@ describe("loadScript Utility", () => {
 
   it("creates script element and resolves on load", async () => {
     const scriptUrl = "https://example.com/script.js";
-    const mockScript = document.createElement('script');
-    
+
+    // Ensure GalliMapPlugin doesn't exist
+    delete (window as any).GalliMapPlugin;
+
+    const mockScript = document.createElement("script");
+
     // Mock document.createElement
-    const createElementSpy = jest.spyOn(document, 'createElement').mockReturnValue(mockScript);
-    const appendChildSpy = jest.spyOn(document.head, 'appendChild').mockImplementation(() => mockScript);
-    
+    const createElementSpy = jest
+      .spyOn(document, "createElement")
+      .mockReturnValue(mockScript);
+    const appendChildSpy = jest
+      .spyOn(document.head, "appendChild")
+      .mockImplementation(() => mockScript);
+
     const loadPromise = loadScript(scriptUrl);
 
     // Verify script properties are set
-    expect(createElementSpy).toHaveBeenCalledWith('script');
+    expect(createElementSpy).toHaveBeenCalledWith("script");
     expect(mockScript.src).toBe(scriptUrl);
     expect(mockScript.async).toBe(true);
     expect(appendChildSpy).toHaveBeenCalledWith(mockScript);
 
     // Simulate successful load
     if (mockScript.onload) {
-      mockScript.onload(new Event('load'));
+      mockScript.onload(new Event("load"));
     }
 
     await expect(loadPromise).resolves.toBeUndefined();

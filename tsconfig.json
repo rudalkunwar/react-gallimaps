@@ -22,8 +22,9 @@
     "noImplicitReturns": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "importHelpers": true
+    "importHelpers": true,
+    "removeComments": true
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "tests", "**/*.test.*"]
+  "exclude": ["node_modules", "dist", "tests", "**/*.test.*", "example"]
 }
