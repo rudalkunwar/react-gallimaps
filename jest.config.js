@@ -1,7 +1,19 @@
-module.exports = {
+export default {
   preset: "ts-jest",
   testEnvironment: "jsdom",
-  setupFilesAfterEnv: ["<rootDir>/tests/setup-simple.ts"],
+  extensionsToTreatAsEsm: [".ts", ".tsx"],
+  moduleNameMapping: {
+    "^(\\.{1,2}/.*)\\.js$": "$1",
+  },
+  transform: {
+    "^.+\\.(ts|tsx)$": [
+      "ts-jest",
+      {
+        useESM: true,
+      },
+    ],
+  },
+  setupFilesAfterEnv: ["<rootDir>/tests/setup.ts"],
   testMatch: [
     "<rootDir>/tests/**/*.test.{ts,tsx}",
     "<rootDir>/src/**/*.test.{ts,tsx}",
@@ -17,10 +29,10 @@ module.exports = {
   testPathIgnorePatterns: ["<rootDir>/node_modules/", "<rootDir>/dist/"],
   coverageThreshold: {
     global: {
-      branches: 45,
-      functions: 45,
-      lines: 60,
-      statements: 60,
+      branches: 80,
+      functions: 80,
+      lines: 80,
+      statements: 80,
     },
   },
 };

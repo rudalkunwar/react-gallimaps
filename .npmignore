@@ -1,59 +1,20 @@
-# Source files
-src/
-*.ts
-*.tsx
-!dist/**/*.d.ts
-
-# Build and development files
-rollup.config.js
-tsconfig.json
-jest.config.cjs
-.eslintrc.js
-
-# Test files
-**/__tests__/
-**/*.test.ts
-**/*.test.tsx
-**/*.spec.ts
-**/*.spec.tsx
-src/setupTests.ts
-
-# Development dependencies
+# Files to exclude from npm package
 node_modules/
-
-# IDE and OS files
+src/
+tests/
+coverage/
+*.test.*
+*.spec.*
+jest.config.js
+tsconfig.json
+rollup.config.js
+.gitignore
+.eslintrc*
+.prettierrc*
+*.log
 .vscode/
 .idea/
+*.swp
+*.swo
 .DS_Store
 Thumbs.db
-
-# Logs and temporary files
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Environment files
-.env*
-
-# Coverage reports
-coverage/
-*.lcov
-.nyc_output
-
-# Git files
-.git/
-.gitignore
-
-# Documentation development
-README_NEW.md
-docs/
-
-# CI/CD files
-.github/
-.travis.yml
-.circleci/
-
-# Miscellaneous
-*.tgz
-*.tar.gz
