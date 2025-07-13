@@ -15,9 +15,15 @@
     "noEmit": false,
     "jsx": "react-jsx",
     "declaration": true,
+    "declarationMap": true,
     "outDir": "./dist",
-    "sourceMap": true
+    "sourceMap": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "importHelpers": true
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "tests"]
+  "exclude": ["node_modules", "dist", "tests", "**/*.test.*"]
 }

@@ -26,12 +26,18 @@ export interface GalliMapOptions {
 }
 
 export interface PinMarkerOptions {
+  /** Marker position latitude */
+  latitude: number;
+  /** Marker position longitude */
+  longitude: number;
+  /** Marker name/title */
+  name?: string;
+  /** Popup text to display */
+  popupText?: string;
   /** Marker color (hex, rgb, or named color) */
-  color: string;
+  color?: string;
   /** Whether the marker is draggable */
-  draggable: boolean;
-  /** Marker position [longitude, latitude] */
-  latLng: [number, number];
+  draggable?: boolean;
 }
 
 export interface PolygonOptions {

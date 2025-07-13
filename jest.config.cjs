@@ -15,6 +15,22 @@ module.exports = {
   coverageReporters: ["text", "lcov", "html"],
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json"],
   testPathIgnorePatterns: ["<rootDir>/node_modules/", "<rootDir>/dist/"],
+  transform: {
+    "^.+\\.(ts|tsx)$": [
+      "ts-jest",
+      {
+        tsconfig: {
+          jsx: "react-jsx",
+        },
+      },
+    ],
+  },
+  moduleNameMapping: {
+    "^@/(.*)$": "<rootDir>/src/$1",
+  },
+  testEnvironmentOptions: {
+    customExportConditions: ["node", "node-addons"],
+  },
   coverageThreshold: {
     global: {
       branches: 45,
