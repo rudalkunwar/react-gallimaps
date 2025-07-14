@@ -26,7 +26,6 @@ npm install react-gallimaps
     <th>Notes</th>
   </tr>
   <tr>
-    <td>React</td>
     <td>≥ 16.8.0</td>
     <td>Hooks support required</td>
   </tr>
@@ -86,6 +85,7 @@ function InteractiveMap() {
     removePolygon,
   } = useGalliMap();
 
+
   const mapOptions = {
     accessToken: "your-token-here",
     map: {
@@ -97,10 +97,6 @@ function InteractiveMap() {
   // Add a marker
   const handleAddMarker = () => {
     const marker = addMarker({
-      color: "#ff0000",
-      draggable: true,
-      latLng: [85.324, 27.7172],
-    });
     console.log("Marker added:", marker);
   };
 
@@ -182,17 +178,9 @@ function InteractiveMap() {
   </tr>
 </table>
 
-### useGalliMap Hook
-
-Returns an object with map interaction methods:
-
 <table>
   <tr>
     <th>Method</th>
-    <th>Parameters</th>
-    <th>Returns</th>
-    <th>Description</th>
-  </tr>
   <tr>
     <td><code>mapRef</code></td>
     <td>-</td>
