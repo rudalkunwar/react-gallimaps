@@ -1,77 +1,81 @@
-export interface GalliMapOptions {
-  /** GalliMaps access token required for API access */
+export interface GallimapOptions {
   accessToken: string;
-  /** Map configuration options */
   map: {
-    /** Container ID for the map (auto-generated if not provided) */
-    container?: string;
-    /** Map center coordinates [longitude, latitude] */
+    container: string | HTMLDivElement;
     center: [number, number];
-    /** Initial zoom level */
     zoom: number;
-    /** Maximum zoom level */
-    maxZoom?: number;
-    /** Minimum zoom level */
-    minZoom?: number;
-    /** Whether map is clickable */
+    minZoom: number;
+    maxZoom: number;
     clickable?: boolean;
   };
-  /** Panorama configuration (optional) */
-  pano?: {
-    /** Container ID for panorama view (auto-generated if not provided) */
-    container?: string;
-  };
-  /** Custom click event handlers */
   customClickFunctions?: Array<(event: any) => void>;
+  pano?: {
+    container: string | HTMLDivElement;
+  };
 }
 
-export interface PinMarkerOptions {
-  /** Marker position latitude */
-  latitude: number;
-  /** Marker position longitude */
-  longitude: number;
-  /** Marker name/title */
-  name?: string;
-  /** Popup text to display */
-  popupText?: string;
-  /** Marker color (hex, rgb, or named color) */
+// GalliMaps API marker options based on documentation
+export interface GalliMarkerOptions {
   color?: string;
-  /** Whether the marker is draggable */
   draggable?: boolean;
-}
-
-export interface PolygonOptions {
-  /** Unique name for the polygon */
-  name: string;
-  /** Polygon fill color */
-  color: string;
-  /** Polygon opacity (0-1) */
-  opacity: number;
-  /** Polygon height (for 3D polygons) */
-  height?: number;
-  /** Polygon width */
-  width?: number;
-  /** Polygon radius (for circular polygons) */
-  radius?: number;
-  /** Polygon center position [longitude, latitude] */
   latLng: [number, number];
-  /** GeoJSON data for the polygon */
-  geoJson: any;
 }
 
-export interface GalliMapRef {
-  /** Add a pin marker to the map */
-  displayPinMarker: (options: PinMarkerOptions) => any;
-  /** Remove a pin marker from the map */
+// GalliMaps API polygon options based on documentation
+export interface GalliPolygonOptions {
+  name: string;
+  color?: string;
+  opacity?: number;
+  height?: number;
+  width?: number;
+  radius?: number;
+  latLng?: [number, number];
+  geoJson: {
+    type: "Feature";
+    geometry: {
+      type: "Polygon" | "LineString" | "Point";
+      coordinates: any;
+    };
+  };
+}
+
+export interface GalliMapPlugin {
+  displayPinMarker: (options: GalliMarkerOptions) => any;
   removePinMarker: (marker: any) => void;
-  /** Search for places with auto-complete functionality */
   autoCompleteSearch: (searchText: string) => Promise<any>;
-  /** Search for a specific location */
-  searchData: (searchText: string) => void;
-  /** Draw a polygon on the map */
-  drawPolygon: (options: PolygonOptions) => void;
-  /** Remove a polygon from the map by name */
+  searchData: (searchText: string) => Promise<any>;
+  drawPolygon: (options: GalliPolygonOptions) => any;
   removePolygon: (name: string) => void;
-  /** Get the underlying GalliMaps instance */
-  getMapInstance: () => any;
+}
+
+export interface GalliMapPluginConstructor {
+  new (options: GallimapOptions): GalliMapPlugin;
+}
+
+export type ScriptStatus = "idle" | "loading" | "ready" | "error";
+
+declare global {
+  interface Window {
+    GalliMapPlugin: GalliMapPluginConstructor;
+  }
+}
+
+export interface GallimapProps {
+  accessToken: string;
+  center?: [number, number];
+  zoom?: number;
+  minZoom?: number;
+  maxZoom?: number;
+  clickable?: boolean;
+  customClickFunctions?: Array<(event: any) => void>;
+  panoId?: string;
+  mapStyle?: React.CSSProperties;
+  panoStyle?: React.CSSProperties;
+  onMapInit?: (map: GalliMapPlugin) => void;
+  children?: React.ReactNode;
+}
+
+export interface GallimapsContextType {
+  mapInstance: GalliMapPlugin | null;
+  setMapInstance: (map: GalliMapPlugin | null) => void;
 }

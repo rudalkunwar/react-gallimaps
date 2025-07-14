@@ -5,7 +5,7 @@ import terser from "@rollup/plugin-terser";
 
 /** Development build configuration with source maps */
 export default {
-  input: "src/index.tsx",
+  input: "src/index.ts",
   output: [
     {
       file: "dist/index.cjs.js",

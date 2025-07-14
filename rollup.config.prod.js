@@ -6,7 +6,7 @@ import terser from "@rollup/plugin-terser";
 const isProduction = process.env.NODE_ENV === "production";
 
 export default {
-  input: "src/index.tsx",
+  input: "src/index.ts",
   output: [
     {
       file: "dist/index.cjs.js",

@@ -1,152 +1,124 @@
-import React, { useEffect, useRef, useImperativeHandle, forwardRef, useState } from 'react';
-import { loadScript } from '../utils/loadScript';
-import { GalliMapOptions, GalliMapRef } from '../types';
+import React, { useEffect, useRef, useState } from 'react';
+import { useGallimaps } from '../context/GallimapsContext';
+import { useScript } from '../hooks/useScript';
+import { GallimapProps, GalliMapPlugin, GallimapOptions } from '../types';
 
-declare global {
-    interface Window {
-        GalliMapPlugin: any;
-    }
-}
+const Gallimap: React.FC<GallimapProps> = ({
+    accessToken,
+    center = [27.7172, 85.3240],  // Default: Kathmandu
+    zoom = 15,
+    minZoom = 5,
+    maxZoom = 25,
+    clickable = false,
+    customClickFunctions = [],
+    panoId,
+    mapStyle = { width: '100%', height: '400px' },
+    panoStyle = { width: '100%', height: '300px' },
+    onMapInit,
+    children
+}) => {
+    const mapRef = useRef<HTMLDivElement>(null);
+    const panoRef = useRef<HTMLDivElement>(null);
+    const { mapInstance, setMapInstance } = useGallimaps();
+    const [isMounted, setIsMounted] = useState(false);
+    const scriptStatus = useScript('https://gallimap.com/static/dist/js/gallimaps.vector.min.latest.js');
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
-interface GalliMapProps {
-    options: GalliMapOptions;
-    style?: React.CSSProperties;
-    className?: string;
-    panoStyle?: React.CSSProperties;
-    panoClassName?: string;
-    onMapLoad?: (map: any) => void;
-    onMapError?: (error: Error) => void;
-}
-
-/** Pre-defined styles to prevent object recreation on re-renders */
-const DEFAULT_STYLE = { width: '100%', height: '400px' };
-const ERROR_STYLE = {
-    color: '#dc3545',
-    padding: '20px',
-    textAlign: 'center' as const,
-    backgroundColor: '#f8d7da',
-    border: '1px solid #f5c6cb',
-    borderRadius: '4px',
-    margin: '10px 0'
-};
-const LOADING_STYLE = {
-    padding: '20px',
-    textAlign: 'center' as const,
-    backgroundColor: '#f8f9fa',
-    border: '1px solid #dee2e6',
-    borderRadius: '4px',
-    margin: '10px 0'
-};
-
-/**
- * React component for rendering GalliMaps with full TypeScript support
- * Handles script loading, map initialization, and provides imperative API
- */
-const GalliMap = forwardRef<GalliMapRef, GalliMapProps>(({
-    options,
-    style = DEFAULT_STYLE,
-    className,
-    panoStyle,
-    panoClassName,
-    onMapLoad,
-    onMapError,
-}, ref) => {
-    const mapContainerRef = useRef<HTMLDivElement>(null);
-    const panoContainerRef = useRef<HTMLDivElement>(null);
-    const mapInstanceRef = useRef<any>(null);
-    const [error, setError] = useState<Error | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
-
-    /** Expose map methods through ref for imperative access */
-    useImperativeHandle(ref, () => ({
-        displayPinMarker: (markerOptions) => mapInstanceRef.current?.displayPinMarker(markerOptions),
-        removePinMarker: (marker) => mapInstanceRef.current?.removePinMarker(marker),
-        autoCompleteSearch: (searchText) => mapInstanceRef.current?.autoCompleteSearch(searchText),
-        searchData: (searchText) => mapInstanceRef.current?.searchData(searchText),
-        drawPolygon: (polygonOptions) => mapInstanceRef.current?.drawPolygon(polygonOptions),
-        removePolygon: (name) => mapInstanceRef.current?.removePolygon(name),
-        getMapInstance: () => mapInstanceRef.current,
-    }), []);
-
+    // Track component mount state
     useEffect(() => {
-        const initializeMap = async () => {
-            try {
-                setIsLoading(true);
-                setError(null);
+        setIsMounted(true);
+        return () => setIsMounted(false);
+    }, []);
 
-                await loadScript();
+    // Initialize map when conditions are met
+    useEffect(() => {
+        if (scriptStatus !== 'ready' || !isMounted || !mapRef.current || mapInstance) return;
 
-                /** Generate unique container IDs to prevent conflicts */
-                const mapId = `gallimaps-${Date.now()}`;
-                const panoId = `gallipano-${Date.now()}`;
+        setLoading(true);
 
-                if (mapContainerRef.current) {
-                    mapContainerRef.current.id = mapId;
-                }
-                if (panoContainerRef.current) {
-                    panoContainerRef.current.id = panoId;
-                }
+        try {
+            const options: GallimapOptions = {
+                accessToken,
+                map: {
+                    container: 'gallimap-' + Date.now(), // Use a unique ID
+                    center,
+                    zoom,
+                    minZoom,
+                    maxZoom,
+                    clickable
+                },
+                customClickFunctions
+            };
 
-                const galliMapsOptions = {
-                    ...options,
-                    map: { ...options.map, container: mapId },
-                    pano: options.pano ? { ...options.pano, container: panoId } : undefined,
-                };
+            // Set the ID on the map div
+            mapRef.current.id = options.map.container as string;
 
-                mapInstanceRef.current = new window.GalliMapPlugin(galliMapsOptions);
-                onMapLoad?.(mapInstanceRef.current);
-            } catch (err) {
-                const error = err instanceof Error ? err : new Error('Failed to initialize GalliMaps');
-                setError(error);
-                onMapError?.(error);
-            } finally {
-                setIsLoading(false);
+            // Always add pano configuration since the library expects it
+            if (panoRef.current) {
+                const panoContainerId = panoId ? 'gallimap-pano-' + Date.now() : 'gallimap-pano-hidden-' + Date.now();
+                panoRef.current.id = panoContainerId;
+                options.pano = { container: panoContainerId };
             }
-        };
 
-        initializeMap();
+            const gallimap = new window.GalliMapPlugin(options);
+            setMapInstance(gallimap);
+            setError(null);
+            if (onMapInit) onMapInit(gallimap);
+        } catch (err) {
+            console.error('Gallimaps initialization failed:', err);
+            setError(err instanceof Error ? err.message : 'Failed to initialize map');
+        } finally {
+            setLoading(false);
+        }
 
         return () => {
-            mapInstanceRef.current = null;
+            if (mapInstance) {
+                // Add any necessary cleanup logic here
+                setMapInstance(null);
+            }
         };
-    }, [options, onMapLoad, onMapError]);
-
-    if (error) {
-        return (
-            <div style={ERROR_STYLE} data-testid="gallimap-error">
-                <strong>Error loading map:</strong> {error.message}
-            </div>
-        );
-    }
-
-    if (isLoading) {
-        return (
-            <div style={LOADING_STYLE} data-testid="gallimap-loading">
-                Loading GalliMaps...
-            </div>
-        );
-    }
+    }, [
+        scriptStatus,
+        isMounted,
+        accessToken,
+        center,
+        zoom,
+        mapInstance,
+        panoId
+    ]);
 
     return (
-        <div>
+        <div className="gallimap-container">
+            {loading && <div className="map-loading">Loading map...</div>}
+            {error && <div className="map-error">Error: {error}</div>}
+
             <div
-                ref={mapContainerRef}
-                style={style}
-                className={className}
-                data-testid="gallimap-container"
+                ref={mapRef}
+                style={mapStyle}
+                className="gallimap"
             />
-            {options.pano && (
+
+            {panoId && (
                 <div
-                    ref={panoContainerRef}
+                    ref={panoRef}
                     style={panoStyle}
-                    className={panoClassName}
-                    data-testid="gallimap-pano"
+                    className="gallimap-pano"
                 />
             )}
+
+            {/* Hidden pano div for cases when panoId is not provided but library expects it */}
+            {!panoId && (
+                <div
+                    ref={panoRef}
+                    style={{ display: 'none' }}
+                    className="gallimap-pano-hidden"
+                />
+            )}
+
+            {children}
         </div>
     );
-});
+};
 
-GalliMap.displayName = 'GalliMap';
-
-export default GalliMap;
+export default Gallimap;
