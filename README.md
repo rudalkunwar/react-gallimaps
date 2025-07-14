@@ -9,6 +9,48 @@ A minimalist React wrapper for the GalliMaps Vector Plugin – Easy integration 
 
 ---
 
+## Installation
+
+```bash
+npm install react-gallimaps
+```
+
+---
+
+## Quick Start Example
+
+```tsx
+import React from "react";
+import {
+  GallimapsProvider,
+  Gallimap,
+  Marker,
+  Polygon,
+  Search,
+} from "react-gallimaps";
+
+export default function App() {
+  return (
+    <GallimapsProvider>
+      <Gallimap accessToken="your-token">
+        <Marker position={[27.7172, 85.324]} color="red" draggable />
+        <Polygon
+          name="test"
+          coordinates={[
+            [27.7172, 85.324],
+            [27.718, 85.325],
+            [27.719, 85.323],
+          ]}
+        />
+        <Search onSelect={(result) => console.log(result)} />
+      </Gallimap>
+    </GallimapsProvider>
+  );
+}
+```
+
+---
+
 ## 🚀 Features
 
 ### 1. Map Initialization & Customization
@@ -289,314 +331,3 @@ You can customize the appearance of the map, panorama, markers, polygons, and se
 - **index.ts** (in `src/`): Main entry point, re-exports all components, hooks, and types.
 
 ---
-
-## Installation
-
-```bash
-npm install react-gallimaps
-```
-
----
-
-## Requirements
-
-<table>
-  <tr>
-    <th>Requirement</th>
-    <th>Version</th>
-    <th>Notes</th>
-  </tr>
-  <tr>
-    <td>React</td>
-    <td>&gt;=16.8.0</td>
-    <td>Hooks support required</td>
-  </tr>
-  <tr>
-    <td>GalliMaps Token</td>
-    <td>-</td>
-    <td>Get from <a href="https://gallimap.com">gallimap.com</a></td>
-  </tr>
-  <tr>
-    <td>TypeScript</td>
-    <td>&gt;=4.0</td>
-    <td>(Optional) Full type definitions</td>
-  </tr>
-</table>
-
----
-
-## Quick Start Example
-
-```tsx
-import React from "react";
-import {
-  GallimapsProvider,
-  Gallimap,
-  Marker,
-  Polygon,
-  Search,
-} from "react-gallimaps";
-
-export default function App() {
-  return (
-    <GallimapsProvider>
-      <Gallimap accessToken="your-token">
-        <Marker position={[27.7172, 85.324]} color="red" draggable />
-        <Polygon
-          name="test"
-          coordinates={[
-            [27.7172, 85.324],
-            [27.718, 85.325],
-            [27.719, 85.323],
-          ]}
-        />
-        <Search onSelect={(result) => console.log(result)} />
-      </Gallimap>
-    </GallimapsProvider>
-  );
-}
-```
-
----
-
-## Component Usage
-
-### `<GallimapsProvider>`
-
-Wrap your app or map section to provide context for all map components and hooks.
-
-### `<Gallimap />` Props
-
-<table>
-  <tr>
-    <th>Prop</th>
-    <th>Type</th>
-    <th>Required</th>
-    <th>Default</th>
-    <th>Description</th>
-  </tr>
-  <tr>
-    <td>accessToken</td>
-    <td>string</td>
-    <td>Yes</td>
-    <td>–</td>
-    <td>GalliMaps API token</td>
-  </tr>
-  <tr>
-    <td>center</td>
-    <td>[number, number]</td>
-    <td>No</td>
-    <td>[27.7172,85.3240]</td>
-    <td>Map center (lat, lng)</td>
-  </tr>
-  <tr>
-    <td>zoom</td>
-    <td>number</td>
-    <td>No</td>
-    <td>15</td>
-    <td>Initial zoom level</td>
-  </tr>
-  <tr>
-    <td>minZoom, maxZoom</td>
-    <td>number</td>
-    <td>No</td>
-    <td>5, 25</td>
-    <td>Min/max zoom</td>
-  </tr>
-  <tr>
-    <td>clickable</td>
-    <td>boolean</td>
-    <td>No</td>
-    <td>false</td>
-    <td>Enable map click events</td>
-  </tr>
-  <tr>
-    <td>customClickFunctions</td>
-    <td>Array&lt;function&gt;</td>
-    <td>No</td>
-    <td>[]</td>
-    <td>Custom click handlers</td>
-  </tr>
-  <tr>
-    <td>panoId</td>
-    <td>string</td>
-    <td>No</td>
-    <td>–</td>
-    <td>Panorama container id</td>
-  </tr>
-  <tr>
-    <td>mapStyle, panoStyle</td>
-    <td>React.CSSProperties</td>
-    <td>No</td>
-    <td>–</td>
-    <td>Custom styles for map/panorama</td>
-  </tr>
-  <tr>
-    <td>onMapInit</td>
-    <td>(map: GalliMapPlugin) =&gt; void</td>
-    <td>No</td>
-    <td>–</td>
-    <td>Callback on map init</td>
-  </tr>
-  <tr>
-    <td>children</td>
-    <td>React.ReactNode</td>
-    <td>No</td>
-    <td>–</td>
-    <td>Nested Marker/Polygon/Search</td>
-  </tr>
-</table>
-
-### `<Marker />` Props
-
-<table>
-  <tr>
-    <th>Prop</th>
-    <th>Type</th>
-    <th>Required</th>
-    <th>Description</th>
-  </tr>
-  <tr>
-    <td>position</td>
-    <td>[number, number]</td>
-    <td>Yes</td>
-    <td>Marker position (lat, lng)</td>
-  </tr>
-  <tr>
-    <td>draggable</td>
-    <td>boolean</td>
-    <td>No</td>
-    <td>Draggable marker</td>
-  </tr>
-  <tr>
-    <td>color</td>
-    <td>string</td>
-    <td>No</td>
-    <td>Marker color</td>
-  </tr>
-  <tr>
-    <td>onClick</td>
-    <td>function</td>
-    <td>No</td>
-    <td>Click handler</td>
-  </tr>
-  <tr>
-    <td>className</td>
-    <td>string</td>
-    <td>No</td>
-    <td>Custom CSS class</td>
-  </tr>
-</table>
-
-### `<Polygon />` Props
-
-<table>
-  <tr>
-    <th>Prop</th>
-    <th>Type</th>
-    <th>Required</th>
-    <th>Description</th>
-  </tr>
-  <tr>
-    <td>name</td>
-    <td>string</td>
-    <td>Yes</td>
-    <td>Unique polygon name</td>
-  </tr>
-  <tr>
-    <td>coordinates</td>
-    <td>Array&lt;[number, number]&gt;</td>
-    <td>Yes</td>
-    <td>Polygon coordinates</td>
-  </tr>
-  <tr>
-    <td>type</td>
-    <td>"Polygon" | "LineString" | "Point"</td>
-    <td>No</td>
-    <td>Polygon type</td>
-  </tr>
-  <tr>
-    <td>style</td>
-    <td>object</td>
-    <td>No</td>
-    <td>Polygon style (color, etc)</td>
-  </tr>
-  <tr>
-    <td>onPolygonClick</td>
-    <td>function</td>
-    <td>No</td>
-    <td>Polygon click handler</td>
-  </tr>
-</table>
-
-### `<Search />` Props
-
-<table>
-  <tr>
-    <th>Prop</th>
-    <th>Type</th>
-    <th>Required</th>
-    <th>Description</th>
-  </tr>
-  <tr>
-    <td>onSelect</td>
-    <td>function</td>
-    <td>No</td>
-    <td>Called on result select</td>
-  </tr>
-  <tr>
-    <td>onResults</td>
-    <td>function</td>
-    <td>No</td>
-    <td>Called with search results</td>
-  </tr>
-  <tr>
-    <td>placeholder</td>
-    <td>string</td>
-    <td>No</td>
-    <td>Input placeholder</td>
-  </tr>
-  <tr>
-    <td>className</td>
-    <td>string</td>
-    <td>No</td>
-    <td>Custom CSS class</td>
-  </tr>
-</table>
-
----
-
-## Hooks
-
-- `useGallimaps()` – Access map instance/context.
-- `useGallimapsAPI()` – Programmatic control for markers, polygons, search.
-- `useScript()` – Load external scripts.
-
-### Example: Using the API Hook
-
-```tsx
-import { useGallimapsAPI } from "react-gallimaps";
-import { useEffect } from "react";
-
-function MyComponent() {
-  const { displayPinMarker, drawPolygon, isReady } = useGallimapsAPI();
-
-  useEffect(() => {
-    if (isReady) {
-      displayPinMarker({ position: [27.7, 85.3], color: "blue" });
-    }
-  }, [isReady, displayPinMarker]);
-}
-```
-
----
-
-## TypeScript Support
-
-All components and hooks are fully typed. You can import types from `react-gallimaps` for custom integrations.
-
----
-
-## License
-
-MIT
