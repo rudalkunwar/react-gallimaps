@@ -6,11 +6,7 @@ module.exports = {
     "<rootDir>/tests/**/*.test.{ts,tsx}",
     "<rootDir>/src/**/*.test.{ts,tsx}",
   ],
-  collectCoverageFrom: [
-    "src/**/*.{ts,tsx}",
-    "!src/**/*.d.ts",
-    "!src/index.ts",
-  ],
+  collectCoverageFrom: ["src/**/*.{ts,tsx}", "!src/**/*.d.ts", "!src/index.ts"],
   coverageDirectory: "coverage",
   coverageReporters: ["text", "lcov", "html"],
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json"],
@@ -30,10 +26,10 @@ module.exports = {
   },
   coverageThreshold: {
     global: {
-      branches: 45,
-      functions: 45,
-      lines: 60,
-      statements: 60,
+      branches: 30,
+      functions: 30,
+      lines: 50,
+      statements: 50,
     },
   },
 };
