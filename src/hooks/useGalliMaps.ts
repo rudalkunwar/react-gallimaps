@@ -59,8 +59,21 @@ export const useGallimapsAPI = (): GallimapsAPIHook => {
   const displayPinMarker = useCallback(
     (options: MarkerOptions) => {
       if (!mapInstance) return null;
+      // Save current center (workaround for auto-centering)
+      const currentCenter = mapInstance.getCenter
+        ? mapInstance.getCenter()
+        : null;
       const galliOptions = transformMarkerOptions(options);
-      return mapInstance.displayPinMarker(galliOptions);
+      const marker = mapInstance.displayPinMarker(galliOptions);
+      // Restore center with a short delay to override plugin's auto-centering
+      if (currentCenter && typeof mapInstance.setCenter === "function") {
+        setTimeout(() => {
+          if (typeof mapInstance.setCenter === "function") {
+            mapInstance.setCenter(currentCenter);
+          }
+        }, 50); // 50ms delay
+      }
+      return marker;
     },
     [mapInstance]
   );

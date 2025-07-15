@@ -86,6 +86,8 @@ export default function App() {
 - Display multiple markers by rendering multiple `<Marker />` components.
 - Custom color and draggable support.
 - `onClick` handler for showing details or actions.
+- **Auto-centering workaround:** The GalliMaps plugin auto-centers the map when a marker is added. This library automatically saves the current map center before adding a marker and restores it with a short delay after the marker is added. This prevents the map from jumping to the marker location. No extra workaround is needed in your app code.
+- **Limitation:** A brief flicker may still occur due to plugin internals. If GalliMaps adds an official option to disable auto-centering, the library will be updated to use it.
 
 **Example:**
 
@@ -94,6 +96,7 @@ export default function App() {
   people.map((person) => (
     <Marker
       key={person.id}
+      markerId={person.id}
       position={person.position}
       color={person.color}
       draggable

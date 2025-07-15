@@ -46,6 +46,8 @@ export interface GalliMapPlugin {
   searchData: (searchText: string) => Promise<any>;
   drawPolygon: (options: GalliPolygonOptions) => any;
   removePolygon: (name: string) => void;
+  getCenter?: () => [number, number];
+  setCenter?: (center: [number, number]) => void;
 }
 
 export interface GalliMapPluginConstructor {

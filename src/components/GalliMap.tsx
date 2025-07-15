@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useGallimaps } from '../context/GallimapsContext';
 import { useScript } from '../hooks/useScript';
 import { GallimapProps, GalliMapPlugin, GallimapOptions } from '../types';
+import { useMarkerRegistry, MarkerData } from '../context/MarkerRegistryContext';
 
 const Gallimap: React.FC<GallimapProps> = ({
     accessToken,
@@ -20,6 +21,7 @@ const Gallimap: React.FC<GallimapProps> = ({
     const mapRef = useRef<HTMLDivElement>(null);
     const panoRef = useRef<HTMLDivElement>(null);
     const { mapInstance, setMapInstance } = useGallimaps();
+    const markersRef = useMarkerRegistry();
     const [isMounted, setIsMounted] = useState(false);
     const scriptStatus = useScript('https://gallimap.com/static/dist/js/gallimaps.vector.min.latest.js');
     const [loading, setLoading] = useState(true);
@@ -30,6 +32,37 @@ const Gallimap: React.FC<GallimapProps> = ({
         setIsMounted(true);
         return () => setIsMounted(false);
     }, []);
+
+    // Centralized marker click handler
+    const handleMapClick = (event: any) => {
+        if (!event || !event.lngLat || !markersRef) return;
+        const { lat, lng } = event.lngLat;
+        const threshold = 40; // meters
+        const toRad = (x: number) => x * Math.PI / 180;
+        const R = 6371000;
+        const distance = (a: [number, number], b: [number, number]) => {
+            const dLat = toRad(b[0] - a[0]);
+            const dLng = toRad(b[1] - a[1]);
+            const aa = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(toRad(a[0])) * Math.cos(toRad(b[0])) *
+                Math.sin(dLng / 2) * Math.sin(dLng / 2);
+            const c = 2 * Math.atan2(Math.sqrt(aa), Math.sqrt(1 - aa));
+            return R * c;
+        };
+        // Find the closest marker within the threshold
+        let closestMarker: MarkerData | null = null;
+        let minDist = threshold;
+        for (const marker of markersRef.current.values() as IterableIterator<MarkerData>) {
+            const dist = distance([lat, lng], marker.position);
+            if (dist < minDist) {
+                minDist = dist;
+                closestMarker = marker;
+            }
+        }
+        if (closestMarker && closestMarker.onClick) closestMarker.onClick(closestMarker);
+        // Call any user customClickFunctions
+        customClickFunctions.forEach(fn => fn(event));
+    };
 
     // Initialize map when conditions are met
     useEffect(() => {
@@ -48,7 +81,7 @@ const Gallimap: React.FC<GallimapProps> = ({
                     maxZoom,
                     clickable
                 },
-                customClickFunctions
+                customClickFunctions: [handleMapClick]
             };
 
             // Set the ID on the map div
