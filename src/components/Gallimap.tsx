@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useGallimaps } from "../context/GallimapsContext";
 import { useScript } from "../hooks/useScript";
-import { GallimapProps, GallimapOptions, GalliMapPlugin } from "../types";
+import { GallimapProps, GallimapOptions, GalliMapPlugin, MapOptions } from "../types";
 import { useMarkerRegistry, MarkerData } from "../context/MarkerRegistryContext";
 import { isBrowser } from "../utils";
 
@@ -15,12 +15,15 @@ const Gallimap: React.FC<GallimapProps> = ({
   minZoom = 5,
   maxZoom = 25,
   clickable = false,
+  mapOptions,
   customClickFunctions = [],
+  pano = false,
   panoId,
   shareId,
   mapStyle = { width: "100%", height: "400px" },
   panoStyle = { width: "100%", height: "300px" },
   shareStyle = { width: "100%", height: "auto" },
+  scriptUrl = SCRIPT_SRC,
   onMapInit,
   children
 }) => {
@@ -42,7 +45,7 @@ const Gallimap: React.FC<GallimapProps> = ({
   const [isMounted, setIsMounted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const scriptStatus = useScript(SCRIPT_SRC);
+  const scriptStatus = useScript(scriptUrl);
 
   // Track component mount state
   useEffect(() => {
@@ -81,10 +84,29 @@ const Gallimap: React.FC<GallimapProps> = ({
     customClickFunctions.forEach((fn) => fn(event));
   };
 
+  const resolvedMapOptions: MapOptions = useMemo(
+    () => ({
+      container: mapOptions?.container ?? mapContainerId,
+      center: mapOptions?.center ?? center,
+      zoom: mapOptions?.zoom ?? zoom,
+      minZoom: mapOptions?.minZoom ?? minZoom,
+      maxZoom: mapOptions?.maxZoom ?? maxZoom,
+      clickable: mapOptions?.clickable ?? clickable
+    }),
+    [mapOptions, mapContainerId, center, zoom, minZoom, maxZoom, clickable]
+  );
+
+  const shouldRenderPano = Boolean(pano || panoId);
+
   // Initialize map when conditions are met
   useEffect(() => {
     if (!isBrowser()) return;
     if (scriptStatus !== "ready" || !isMounted || !mapRef.current || mapInstance) return;
+
+    if (!accessToken) {
+      setError("GalliMaps accessToken is required (see docs).");
+      return;
+    }
 
     setLoading(true);
 
@@ -92,19 +114,16 @@ const Gallimap: React.FC<GallimapProps> = ({
       const options: GallimapOptions = {
         accessToken,
         map: {
-          container: mapContainerId,
-          center,
-          zoom,
-          minZoom,
-          maxZoom,
-          clickable
+          ...resolvedMapOptions
         },
         customClickFunctions: [handleMapClick]
       };
 
-      mapRef.current.id = mapContainerId;
+      if (typeof resolvedMapOptions.container === "string") {
+        mapRef.current.id = resolvedMapOptions.container;
+      }
 
-      if (panoRef.current) {
+      if (shouldRenderPano && panoRef.current) {
         panoRef.current.id = panoContainerId;
         options.pano = { container: panoContainerId };
       }
@@ -137,6 +156,7 @@ const Gallimap: React.FC<GallimapProps> = ({
     minZoom,
     maxZoom,
     clickable,
+    resolvedMapOptions,
     mapContainerId,
     panoContainerId,
     shareContainerId,
@@ -154,11 +174,7 @@ const Gallimap: React.FC<GallimapProps> = ({
 
       <div ref={mapRef} style={mapStyle} className="gallimap" />
 
-      {panoId && <div ref={panoRef} style={panoStyle} className="gallimap-pano" />}
-
-      {!panoId && (
-        <div ref={panoRef} style={{ display: "none" }} className="gallimap-pano-hidden" />
-      )}
+      {shouldRenderPano && <div ref={panoRef} style={panoStyle} className="gallimap-pano" />}
 
       {shareId && <div ref={shareRef} style={shareStyle} className="gallimap-share" />}
 
@@ -168,4 +184,3 @@ const Gallimap: React.FC<GallimapProps> = ({
 };
 
 export default Gallimap;
-

@@ -1,15 +1,17 @@
 import type React from "react";
 
+export interface MapOptions {
+  container: string | HTMLDivElement;
+  center: [number, number];
+  zoom: number;
+  minZoom: number;
+  maxZoom: number;
+  clickable?: boolean;
+}
+
 export interface GallimapOptions {
   accessToken: string;
-  map: {
-    container: string | HTMLDivElement;
-    center: [number, number];
-    zoom: number;
-    minZoom: number;
-    maxZoom: number;
-    clickable?: boolean;
-  };
+  map: MapOptions;
   customClickFunctions?: Array<(event: any) => void>;
   pano?: {
     container: string | HTMLDivElement;
@@ -69,17 +71,31 @@ declare global {
 
 export interface GallimapProps {
   accessToken: string;
+  /**
+   * Map config as documented by GalliMaps: container, center, zoom, minZoom, maxZoom, clickable.
+   * If omitted, sensible defaults are used and container is generated automatically.
+   */
+  mapOptions?: Partial<MapOptions>;
   center?: [number, number];
   zoom?: number;
   minZoom?: number;
   maxZoom?: number;
   clickable?: boolean;
   customClickFunctions?: Array<(event: any) => void>;
+  /**
+   * Whether to render a panorama container. If true, a container is created automatically.
+   * Provide panoId to control the DOM id.
+   */
+  pano?: boolean;
   panoId?: string;
   shareId?: string;
   mapStyle?: React.CSSProperties;
   panoStyle?: React.CSSProperties;
   shareStyle?: React.CSSProperties;
+  /**
+   * Override the script URL if self-hosting the plugin.
+   */
+  scriptUrl?: string;
   onMapInit?: (map: GalliMapPlugin) => void;
   children?: React.ReactNode;
 }

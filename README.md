@@ -12,7 +12,7 @@ npm install react react-dom
 
 ## Requirements
 - React 18+
-- GalliMaps access token
+- A **real** GalliMaps access token (required by the official plugin; placeholder tokens will not reliably load tiles/search) citeturn0search1
 - Runs in the browser (SSR-safe guards are built in; hydrate client-side)
 
 ## Quick start
@@ -68,15 +68,18 @@ export default function Page() {
 ### `<Gallimap />`
 Props:
 - `accessToken` (string, required)
+- `mapOptions?: { container?, center?, zoom?, minZoom?, maxZoom?, clickable? }` – mirrors the official `map` config
 - `center?: [number, number]` (default Kathmandu)
 - `zoom?: number` (default 15)
 - `minZoom?: number` (default 5)
 - `maxZoom?: number` (default 25)
 - `clickable?: boolean` (default false)
-- `panoId?: string` (renders panorama container)
+- `pano?: boolean` (auto-creates a panorama container)
+- `panoId?: string` (custom id for panorama container)
 - `shareId?: string` (renders share container)
 - `mapStyle?`, `panoStyle?`, `shareStyle?` – inline styles
 - `customClickFunctions?: ((event: any) => void)[]`
+- `scriptUrl?: string` (override if you self-host the GalliMaps script)
 - `onMapInit?: (map) => void`
 - `children` – nested `Marker`, `Polygon`, `Search`, or custom UI
 
@@ -147,4 +150,3 @@ Scripts (from this repo):
 
 ## License
 MIT
-
