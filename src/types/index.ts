@@ -1,3 +1,5 @@
+import type React from "react";
+
 export interface GallimapOptions {
   accessToken: string;
   map: {
@@ -10,6 +12,9 @@ export interface GallimapOptions {
   };
   customClickFunctions?: Array<(event: any) => void>;
   pano?: {
+    container: string | HTMLDivElement;
+  };
+  share?: {
     container: string | HTMLDivElement;
   };
 }
@@ -71,8 +76,10 @@ export interface GallimapProps {
   clickable?: boolean;
   customClickFunctions?: Array<(event: any) => void>;
   panoId?: string;
+  shareId?: string;
   mapStyle?: React.CSSProperties;
   panoStyle?: React.CSSProperties;
+  shareStyle?: React.CSSProperties;
   onMapInit?: (map: GalliMapPlugin) => void;
   children?: React.ReactNode;
 }
