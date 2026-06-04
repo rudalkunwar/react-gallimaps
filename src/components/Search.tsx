@@ -1,95 +1,95 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import { useGallimapsAPI } from '../hooks/useGalliMaps';
-import { SearchProps } from '../types/components';
+import React, { useState, useCallback, useEffect } from "react";
+import { useGallimapsAPI } from "../hooks/useGallimapsAPI";
+import { SearchProps, SearchResult } from "../types/components";
 
-const Search: React.FC<SearchProps> = ({
-    onSelect,
-    onResults,
-    placeholder = 'Search locations...',
-    className
-}) => {
-    const [searchText, setSearchText] = useState('');
-    const [results, setResults] = useState<any[]>([]);
-    const [isLoading, setIsLoading] = useState(false);
-    const { autoCompleteSearch, searchData, isReady } = useGallimapsAPI();
+const MIN_QUERY_LENGTH = 3;
+const DEBOUNCE_MS = 300;
 
-    const handleSearch = useCallback(async (text: string) => {
-        if (!isReady || text.length < 3) {
-            setResults([]);
-            return;
-        }
+const labelOf = (result: SearchResult): string =>
+  result.name ?? result.display_name ?? "";
 
-        setIsLoading(true);
-        try {
-            const searchResults = await autoCompleteSearch(text);
-            const resultsArray = Array.isArray(searchResults) ? searchResults : [];
-            setResults(resultsArray);
-            if (onResults) {
-                onResults(resultsArray);
-            }
-        } catch (error) {
-            console.error('Search failed:', error);
-            setResults([]);
-            if (onResults) {
-                onResults([]);
-            }
-        } finally {
-            setIsLoading(false);
-        }
-    }, [isReady, autoCompleteSearch, onResults]);
+/**
+ * A debounced autocomplete search box wired to the GalliMaps search API.
+ * Renders a styled input and result list (override via the documented
+ * `.gallimap-search*` class names).
+ */
+const Search = ({
+  onSelect,
+  onResults,
+  placeholder = "Search locations...",
+  className,
+}: SearchProps) => {
+  const [searchText, setSearchText] = useState("");
+  const [results, setResults] = useState<SearchResult[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const { autoCompleteSearch, searchData, isReady } = useGallimapsAPI();
 
-    const handleSelect = async (result: any) => {
-        try {
-            // Use searchData to get detailed location data and display on map
-            await searchData(result.name || result.toString());
-
-            if (onSelect) {
-                onSelect(result);
-            }
-        } catch (error) {
-            console.error('Failed to search data:', error);
-        }
-
-        setSearchText(result.name || result.toString());
+  const runSearch = useCallback(
+    async (text: string) => {
+      if (!isReady || text.length < MIN_QUERY_LENGTH) {
         setResults([]);
-    };
+        onResults?.([]);
+        return;
+      }
 
-    // Debounced search
-    useEffect(() => {
-        const timeoutId = setTimeout(() => {
-            handleSearch(searchText);
-        }, 300);
+      setIsLoading(true);
+      try {
+        const found = (await autoCompleteSearch(text)) as SearchResult[];
+        setResults(found);
+        onResults?.(found);
+      } catch (error) {
+        console.error("GalliMaps search failed:", error);
+        setResults([]);
+        onResults?.([]);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [isReady, autoCompleteSearch, onResults],
+  );
 
-        return () => clearTimeout(timeoutId);
-    }, [searchText, handleSearch]);
+  const handleSelect = async (result: SearchResult) => {
+    const label = labelOf(result);
+    try {
+      await searchData(label);
+      onSelect?.(result);
+    } catch (error) {
+      console.error("GalliMaps searchData failed:", error);
+    }
+    setSearchText(label);
+    setResults([]);
+  };
 
-    return (
-        <div className={`gallimap-search ${className || ''}`}>
-            <input
-                type="text"
-                value={searchText}
-                onChange={(e) => setSearchText(e.target.value)}
-                placeholder={placeholder}
-                className="gallimap-search-input"
-            />
-            {isLoading && (
-                <div className="gallimap-search-loading">Searching...</div>
-            )}
-            {results.length > 0 && (
-                <ul className="gallimap-search-results">
-                    {results.map((result, index) => (
-                        <li
-                            key={index}
-                            onClick={() => handleSelect(result)}
-                            className="gallimap-search-result"
-                        >
-                            {result.name || result.display_name || result.toString()}
-                        </li>
-                    ))}
-                </ul>
-            )}
-        </div>
-    );
+  useEffect(() => {
+    const timeoutId = setTimeout(() => runSearch(searchText), DEBOUNCE_MS);
+    return () => clearTimeout(timeoutId);
+  }, [searchText, runSearch]);
+
+  return (
+    <div className={`gallimap-search ${className ?? ""}`.trim()}>
+      <input
+        type="text"
+        value={searchText}
+        onChange={(e) => setSearchText(e.target.value)}
+        placeholder={placeholder}
+        className="gallimap-search-input"
+      />
+      {isLoading && <div className="gallimap-search-loading">Searching...</div>}
+      {results.length > 0 && (
+        <ul className="gallimap-search-results">
+          {results.map((result, index) => (
+            <li
+              key={index}
+              onClick={() => handleSelect(result)}
+              className="gallimap-search-result"
+            >
+              {labelOf(result) || "Unknown location"}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
 };
 
 export default Search;

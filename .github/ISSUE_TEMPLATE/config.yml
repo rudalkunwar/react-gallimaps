@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Questions & discussions
+    url: https://github.com/rudalkunwar/react-gallimaps/discussions
+    about: Ask questions and share ideas with the community.
+  - name: 🗺️ GalliMaps platform
+    url: https://gallimap.com/
+    about: For issues with the GalliMaps service or access tokens.

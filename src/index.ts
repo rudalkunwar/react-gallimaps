@@ -1,6 +1,14 @@
-// Main exports for the react-gallimaps package
+// Public API for react-gallimaps
 export * from "./components";
-export * from "./types";
 export * from "./hooks";
 export * from "./utils";
-export { useScript } from "./hooks/useScript";
+export * from "./types";
+export type {
+  MarkerProps,
+  PolygonProps,
+  SearchProps,
+  SearchResult,
+  MarkerOptions,
+  PolygonOptions,
+  GallimapsAPIHook,
+} from "./types/components";

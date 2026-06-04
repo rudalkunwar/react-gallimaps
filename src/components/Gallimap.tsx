@@ -1,12 +1,32 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useGallimaps } from "../context/GallimapsContext";
 import { useScript } from "../hooks/useScript";
-import { GallimapProps, GallimapOptions, GalliMapPlugin, MapOptions } from "../types";
-import { useMarkerRegistry, MarkerData } from "../context/MarkerRegistryContext";
+import {
+  GallimapProps,
+  GallimapOptions,
+  GalliMapClickEvent,
+  GalliMapPlugin,
+  MapOptions,
+  MarkerData,
+} from "../types";
 import { isBrowser } from "../utils";
 
 const SCRIPT_SRC = "https://gallimap.com/static/dist/js/gallimaps.vector.min.latest.js";
 const DEFAULT_CENTER: [number, number] = [27.7172, 85.324];
+/** Max distance (meters) for a map click to be attributed to a marker. */
+const MARKER_CLICK_THRESHOLD_M = 40;
+const EARTH_RADIUS_M = 6371000;
+
+/** Great-circle distance between two [lat, lng] points, in meters. */
+const haversine = (a: [number, number], b: [number, number]): number => {
+  const toRad = (x: number) => (x * Math.PI) / 180;
+  const dLat = toRad(b[0] - a[0]);
+  const dLng = toRad(b[1] - a[1]);
+  const h =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(a[0])) * Math.cos(toRad(b[0])) * Math.sin(dLng / 2) ** 2;
+  return EARTH_RADIUS_M * 2 * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h));
+};
 
 const Gallimap: React.FC<GallimapProps> = ({
   accessToken,
@@ -25,64 +45,51 @@ const Gallimap: React.FC<GallimapProps> = ({
   shareStyle = { width: "100%", height: "auto" },
   scriptUrl = SCRIPT_SRC,
   onMapInit,
-  children
+  children,
 }) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const panoRef = useRef<HTMLDivElement>(null);
   const shareRef = useRef<HTMLDivElement>(null);
+
   const mapContainerId = useMemo(() => `gallimap-${Date.now()}`, []);
   const panoContainerId = useMemo(
-    () => (panoId ? panoId : `gallimap-pano-${Date.now()}`),
-    [panoId]
+    () => panoId ?? `gallimap-pano-${Date.now()}`,
+    [panoId],
   );
   const shareContainerId = useMemo(
-    () => (shareId ? shareId : `gallimap-share-${Date.now()}`),
-    [shareId]
+    () => shareId ?? `gallimap-share-${Date.now()}`,
+    [shareId],
   );
 
-  const { mapInstance, setMapInstance } = useGallimaps();
-  const markersRef = useMarkerRegistry();
-  const [isMounted, setIsMounted] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const { mapInstance, setMapInstance, markersRef } = useGallimaps();
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   const scriptStatus = useScript(scriptUrl);
 
-  // Track component mount state
-  useEffect(() => {
-    setIsMounted(true);
-    return () => setIsMounted(false);
-  }, []);
+  // Keep the latest custom click handlers without forcing the init effect to
+  // re-run (and re-create the map) when the callback identity changes.
+  const customClickRef = useRef(customClickFunctions);
+  customClickRef.current = customClickFunctions;
 
-  // Centralized marker click handler
-  const handleMapClick = (event: any) => {
-    if (!event || !event.lngLat || !markersRef) return;
-    const { lat, lng } = event.lngLat;
-    const threshold = 40; // meters
-    const toRad = (x: number) => (x * Math.PI) / 180;
-    const R = 6371000;
-    const distance = (a: [number, number], b: [number, number]) => {
-      const dLat = toRad(b[0] - a[0]);
-      const dLng = toRad(b[1] - a[1]);
-      const aa =
-        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        Math.cos(toRad(a[0])) * Math.cos(toRad(b[0])) *
-          Math.sin(dLng / 2) * Math.sin(dLng / 2);
-      const c = 2 * Math.atan2(Math.sqrt(aa), Math.sqrt(1 - aa));
-      return R * c;
-    };
-
-    let closestMarker: MarkerData | null = null;
-    let minDist = threshold;
-    for (const marker of markersRef.current.values() as IterableIterator<MarkerData>) {
-      const dist = distance([lat, lng], marker.position);
-      if (dist < minDist) {
-        minDist = dist;
-        closestMarker = marker;
+  const handleMapClick = useCallback(
+    (event: GalliMapClickEvent) => {
+      if (event?.lngLat) {
+        const { lat, lng } = event.lngLat;
+        let closest: MarkerData | null = null;
+        let minDist = MARKER_CLICK_THRESHOLD_M;
+        for (const marker of markersRef.current.values()) {
+          const dist = haversine([lat, lng], marker.position);
+          if (dist < minDist) {
+            minDist = dist;
+            closest = marker;
+          }
+        }
+        closest?.onClick?.(closest);
       }
-    }
-    if (closestMarker?.onClick) closestMarker.onClick(closestMarker);
-    customClickFunctions.forEach((fn) => fn(event));
-  };
+      customClickRef.current.forEach((fn) => fn(event));
+    },
+    [markersRef],
+  );
 
   const resolvedMapOptions: MapOptions = useMemo(
     () => ({
@@ -91,92 +98,85 @@ const Gallimap: React.FC<GallimapProps> = ({
       zoom: mapOptions?.zoom ?? zoom,
       minZoom: mapOptions?.minZoom ?? minZoom,
       maxZoom: mapOptions?.maxZoom ?? maxZoom,
-      clickable: mapOptions?.clickable ?? clickable
+      clickable: mapOptions?.clickable ?? clickable,
     }),
-    [mapOptions, mapContainerId, center, zoom, minZoom, maxZoom, clickable]
+    [mapOptions, mapContainerId, center, zoom, minZoom, maxZoom, clickable],
   );
 
   const shouldRenderPano = Boolean(pano || panoId);
+  const shouldRenderShare = Boolean(shareId);
 
-  // Initialize map when conditions are met
   useEffect(() => {
     if (!isBrowser()) return;
-    if (scriptStatus !== "ready" || !isMounted || !mapRef.current || mapInstance) return;
+    if (scriptStatus !== "ready" || !mapRef.current || mapInstance) return;
 
     if (!accessToken) {
-      setError("GalliMaps accessToken is required (see docs).");
+      setError("GalliMaps accessToken is required (see the docs).");
       return;
     }
 
     setLoading(true);
-
     try {
-      const options: GallimapOptions = {
-        accessToken,
-        map: {
-          ...resolvedMapOptions
-        },
-        customClickFunctions: [handleMapClick]
-      };
-
       if (typeof resolvedMapOptions.container === "string") {
         mapRef.current.id = resolvedMapOptions.container;
       }
+
+      const options: GallimapOptions = {
+        accessToken,
+        map: { ...resolvedMapOptions },
+        customClickFunctions: [handleMapClick],
+      };
 
       if (shouldRenderPano && panoRef.current) {
         panoRef.current.id = panoContainerId;
         options.pano = { container: panoContainerId };
       }
-
-      if (shareRef.current && shareId) {
+      if (shouldRenderShare && shareRef.current) {
         shareRef.current.id = shareContainerId;
         options.share = { container: shareContainerId };
       }
 
-      const gallimap: GalliMapPlugin = new (window as any).GalliMapPlugin(options);
+      const gallimap: GalliMapPlugin = new window.GalliMapPlugin(options);
       setMapInstance(gallimap);
       setError(null);
       onMapInit?.(gallimap);
     } catch (err) {
-      console.error("Gallimaps initialization failed:", err);
+      console.error("GalliMaps initialization failed:", err);
       setError(err instanceof Error ? err.message : "Failed to initialize map");
     } finally {
       setLoading(false);
     }
 
-    return () => {
-      setMapInstance(null);
-    };
+    return () => setMapInstance(null);
   }, [
     scriptStatus,
-    isMounted,
     accessToken,
-    center,
-    zoom,
-    minZoom,
-    maxZoom,
-    clickable,
     resolvedMapOptions,
-    mapContainerId,
     panoContainerId,
     shareContainerId,
-    shareId,
+    shouldRenderPano,
+    shouldRenderShare,
     mapInstance,
-    setMapInstance
+    setMapInstance,
+    handleMapClick,
+    onMapInit,
   ]);
 
   if (!isBrowser()) return null;
 
   return (
     <div className="gallimap-container">
-      {loading && <div className="map-loading">Loading map...</div>}
-      {error && <div className="map-error">Error: {error}</div>}
+      {loading && <div className="gallimap-loading">Loading map…</div>}
+      {error && <div className="gallimap-error">Error: {error}</div>}
 
       <div ref={mapRef} style={mapStyle} className="gallimap" />
 
-      {shouldRenderPano && <div ref={panoRef} style={panoStyle} className="gallimap-pano" />}
-
-      {shareId && <div ref={shareRef} style={shareStyle} className="gallimap-share" />}
+      {shouldRenderPano && (
+        <div ref={panoRef} style={panoStyle} className="gallimap-pano" />
+      )}
+      {shouldRenderShare && (
+        <div ref={shareRef} style={shareStyle} className="gallimap-share" />
+      )}
 
       {children}
     </div>

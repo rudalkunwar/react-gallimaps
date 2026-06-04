@@ -31,7 +31,9 @@ export const useScript = (src: string): ScriptStatus => {
       return;
     }
 
-    let script = document.querySelector(`script[src="${src}"]`) as HTMLScriptElement | null;
+    let script = document.querySelector(
+      `script[src="${src}"]`,
+    ) as HTMLScriptElement | null;
 
     if (!script) {
       script = document.createElement("script");
@@ -43,7 +45,8 @@ export const useScript = (src: string): ScriptStatus => {
       script.addEventListener("load", handlers.onEvent);
       script.addEventListener("error", handlers.onEvent);
     } else {
-      const currentStatus = (script.getAttribute("data-status") as ScriptStatus) || "ready";
+      const currentStatus =
+        (script.getAttribute("data-status") as ScriptStatus) || "ready";
       setStatus(currentStatus);
       // ensure listeners exist to update this hook instance if status changes later
       script.addEventListener("load", handlers.onEvent);

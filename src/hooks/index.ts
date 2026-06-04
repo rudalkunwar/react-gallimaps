@@ -1,3 +1,2 @@
-export { useGallimapsAPI } from "./useGalliMaps";
+export { useGallimapsAPI } from "./useGallimapsAPI";
 export { useScript } from "./useScript";
-

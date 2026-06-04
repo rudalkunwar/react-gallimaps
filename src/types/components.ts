@@ -1,22 +1,13 @@
-import {
-  GalliMapPlugin,
-  GalliMarkerOptions,
-  GalliPolygonOptions,
-} from "./index";
+import type { MarkerData } from "./index";
 
-// Wrapper types for React components
+/** Options accepted by the `useGallimapsAPI().displayPinMarker` helper. */
 export interface MarkerOptions {
   position: [number, number];
   draggable?: boolean;
   color?: string;
-  onClick?: () => void;
 }
 
-export interface SearchOptions {
-  query: string;
-  limit?: number;
-}
-
+/** Options accepted by the `useGallimapsAPI().drawPolygon` helper. */
 export interface PolygonOptions {
   name: string;
   coordinates: Array<[number, number]>;
@@ -31,27 +22,43 @@ export interface PolygonOptions {
 }
 
 export interface GallimapsAPIHook {
-  displayPinMarker: (options: MarkerOptions) => any;
-  removePinMarker: (marker: any) => void;
-  autoCompleteSearch: (searchText: string) => Promise<any>;
-  searchData: (searchText: string) => Promise<any>;
-  drawPolygon: (options: PolygonOptions) => any;
+  displayPinMarker: (options: MarkerOptions) => unknown;
+  removePinMarker: (marker: unknown) => void;
+  autoCompleteSearch: (searchText: string) => Promise<unknown[]>;
+  searchData: (searchText: string) => Promise<unknown>;
+  drawPolygon: (options: PolygonOptions) => unknown;
   removePolygon: (name: string) => void;
+  /** True once the map instance is available. */
   isReady: boolean;
 }
 
-// Component Props Interfaces
-export interface MarkerProps extends MarkerOptions {
-  className?: string;
+/* ---------------------------------------------------------------- *
+ * Component props
+ * ---------------------------------------------------------------- */
+
+export interface MarkerProps {
+  position: [number, number];
+  color?: string;
+  draggable?: boolean;
+  /** Called with the marker data when the marker is clicked on the map. */
+  onClick?: (marker: MarkerData) => void;
 }
+
+export type PolygonProps = PolygonOptions;
 
 export interface SearchProps {
-  onSelect?: (result: any) => void;
+  /** Called when a search result is selected. */
+  onSelect?: (result: SearchResult) => void;
+  /** Called whenever the list of autocomplete results updates. */
+  onResults?: (results: SearchResult[]) => void;
   placeholder?: string;
   className?: string;
-  onResults?: (results: any[]) => void;
 }
 
-export interface PolygonProps extends PolygonOptions {
-  onPolygonClick?: (event: any) => void;
+/** A single autocomplete result. The GalliMaps API returns loosely-typed
+ * objects, so we model the fields we read and allow the rest. */
+export interface SearchResult {
+  name?: string;
+  display_name?: string;
+  [key: string]: unknown;
 }

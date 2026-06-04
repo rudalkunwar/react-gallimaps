@@ -1,16 +1,25 @@
-import React from 'react';
-import { render } from '@testing-library/react';
-import { GallimapsProvider } from '../context/GallimapsContext';
-import Polygon from '../components/Polygon';
+import React from "react";
+import { render } from "@testing-library/react";
+import { GallimapsProvider } from "../context/GallimapsContext";
+import Gallimap from "../components/Gallimap";
+import Polygon from "../components/Polygon";
 
-describe('Polygon', () => {
-    it('renders Polygon without crashing', () => {
-        render(
-            <GallimapsProvider>
-                <Polygon name="test" coordinates={[[27.7172, 85.3240], [27.7180, 85.3250], [27.7190, 85.3230]]} />
-            </GallimapsProvider>
-        );
-        // Polygon is not rendered in DOM, so just ensure no crash
-        expect(true).toBe(true);
-    });
+describe("Polygon", () => {
+  it("mounts inside a Gallimap without crashing", () => {
+    const { container } = render(
+      <GallimapsProvider>
+        <Gallimap accessToken="test-token">
+          <Polygon
+            name="test-area"
+            coordinates={[
+              [27.7172, 85.324],
+              [27.718, 85.325],
+              [27.719, 85.323],
+            ]}
+          />
+        </Gallimap>
+      </GallimapsProvider>,
+    );
+    expect(container.querySelector(".gallimap-container")).toBeInTheDocument();
+  });
 });

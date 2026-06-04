@@ -1,37 +1,29 @@
-import React, { useEffect } from 'react';
-import { useGallimapsAPI } from '../hooks/useGalliMaps';
-import { PolygonProps } from '../types/components';
+import { useEffect } from "react";
+import { useGallimapsAPI } from "../hooks/useGallimapsAPI";
+import { PolygonProps } from "../types/components";
 
-const Polygon: React.FC<PolygonProps> = ({
-    coordinates,
-    name,
-    type = 'Polygon',
-    style = {},
-    onPolygonClick
-}) => {
-    const { drawPolygon, removePolygon, isReady } = useGallimapsAPI();
+/**
+ * Draws a polygon, line, or point on the parent `<Gallimap />`. Renders nothing
+ * in the DOM — the shape is drawn by the underlying map.
+ */
+const Polygon = ({
+  coordinates,
+  name,
+  type = "Polygon",
+  style = {},
+}: PolygonProps): null => {
+  const { drawPolygon, removePolygon, isReady } = useGallimapsAPI();
 
-    useEffect(() => {
-        if (!isReady || !coordinates.length) return;
+  useEffect(() => {
+    if (!isReady || coordinates.length === 0) return;
 
-        const polygon = drawPolygon({
-            coordinates,
-            name,
-            type,
-            style
-        });
+    drawPolygon({ coordinates, name, type, style });
 
-        if (onPolygonClick && polygon) {
-            // Add click handler if provided
-            // Implementation depends on the map library's API
-        }
+    return () => removePolygon(name);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isReady, name, type, JSON.stringify(coordinates), JSON.stringify(style)]);
 
-        return () => {
-            removePolygon(name);
-        };
-    }, [isReady, coordinates, name, type, style, drawPolygon, removePolygon, onPolygonClick]);
-
-    return null; // Polygon is rendered by the map
+  return null;
 };
 
 export default Polygon;

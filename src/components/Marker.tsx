@@ -1,50 +1,49 @@
-import React, { useEffect, useRef } from 'react';
-import { useGallimapsAPI } from '../hooks/useGalliMaps';
-import { MarkerProps } from '../types/components';
-import { useMarkerRegistry, MarkerData } from '../context/MarkerRegistryContext';
+import { useEffect, useRef } from "react";
+import { useGallimapsAPI } from "../hooks/useGallimapsAPI";
+import { useGallimaps } from "../context/GallimapsContext";
+import { MarkerProps } from "../types/components";
 
-interface InternalMarkerProps extends MarkerProps {
-    markerId: string;
-}
+/** Module-level counter to generate stable, unique marker ids. */
+let markerCounter = 0;
 
-const Marker: React.FC<InternalMarkerProps> = ({
-    position,
-    draggable,
-    color,
-    onClick,
-    className,
-    markerId
-}) => {
-    const { displayPinMarker, removePinMarker, isReady } = useGallimapsAPI();
-    const markersRef = useMarkerRegistry();
-    const markerRef = useRef<any>(null);
+/**
+ * Renders a pin marker on the parent `<Gallimap />`. Renders nothing in the
+ * DOM itself — the pin is drawn by the underlying map. `onClick` is dispatched
+ * by the map's centralized click handler (requires `clickable` on `Gallimap`).
+ */
+const Marker = ({ position, draggable, color, onClick }: MarkerProps): null => {
+  const { displayPinMarker, removePinMarker, isReady } = useGallimapsAPI();
+  const { markersRef } = useGallimaps();
+  const markerRef = useRef<unknown>(null);
+  const idRef = useRef<string>();
+  if (!idRef.current) {
+    idRef.current = `gallimap-marker-${++markerCounter}`;
+  }
 
-    useEffect(() => {
-        if (!isReady || !markersRef) return;
+  const [lat, lng] = position;
 
-        // Only add marker if not already present in registry and not already added in this ref
-        if (!markersRef.current.has(markerId) && !markerRef.current) {
-            const newMarker = displayPinMarker({ position, draggable, color });
-            markerRef.current = newMarker;
-            markersRef.current.set(markerId, { position, onClick } as MarkerData);
-        } else {
-            // Update onClick if marker already exists
-            const existing = markersRef.current.get(markerId);
-            if (existing) {
-                markersRef.current.set(markerId, { ...existing, onClick });
-            }
-        }
+  useEffect(() => {
+    if (!isReady) return;
+    const markerId = idRef.current!;
+    const registry = markersRef.current;
 
-        return () => {
-            if (markerRef.current) {
-                removePinMarker(markerRef.current);
-                markerRef.current = null;
-            }
-            markersRef.current.delete(markerId);
-        };
-    }, [isReady, markerId, position[0], position[1], draggable, color, onClick, displayPinMarker, removePinMarker, markersRef]);
+    if (!markerRef.current) {
+      markerRef.current = displayPinMarker({ position, draggable, color });
+    }
+    registry.set(markerId, { position, onClick });
 
-    return null; // Marker is rendered by the map
+    return () => {
+      if (markerRef.current) {
+        removePinMarker(markerRef.current);
+        markerRef.current = null;
+      }
+      registry.delete(markerId);
+    };
+    // `position` is destructured into lat/lng to keep the dep array stable.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isReady, lat, lng, draggable, color, onClick, displayPinMarker, removePinMarker]);
+
+  return null;
 };
 
 export default Marker;
