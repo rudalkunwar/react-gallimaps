@@ -1,7 +1,7 @@
 {
   "name": "react-gallimaps",
-  "version": "2.0.0",
-  "description": "A minimalist React wrapper for GalliMaps Vector Plugin - Easy integration for Nepal's mapping solution",
+  "version": "2.1.0",
+  "description": "React bindings for GalliMaps (Nepal) - map components plus typed hooks for the Search, Autocomplete, Reverse Geocoding, Routing, and Distance REST APIs",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -59,7 +59,13 @@
     "vector-maps",
     "map-component",
     "react-component",
-    "gis"
+    "gis",
+    "geocoding",
+    "reverse-geocoding",
+    "routing",
+    "autocomplete",
+    "react-native",
+    "nextjs"
   ],
   "author": {
     "name": "Rudal Kunwar",

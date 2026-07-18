@@ -61,7 +61,7 @@ const Gallimap: React.FC<GallimapProps> = ({
     [shareId],
   );
 
-  const { mapInstance, setMapInstance, markersRef } = useGallimaps();
+  const { setMapInstance, markersRef } = useGallimaps();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const scriptStatus = useScript(scriptUrl);
@@ -106,61 +106,87 @@ const Gallimap: React.FC<GallimapProps> = ({
   const shouldRenderPano = Boolean(pano || panoId);
   const shouldRenderShare = Boolean(shareId);
 
+  // Keep the latest map config + init callback in refs so the init effect can
+  // run exactly once without re-creating the map when inline props (e.g. a
+  // `center` array literal or an inline `onMapInit`) change identity.
+  const onMapInitRef = useRef(onMapInit);
+  onMapInitRef.current = onMapInit;
+  const configRef = useRef({
+    resolvedMapOptions,
+    panoContainerId,
+    shareContainerId,
+    shouldRenderShare,
+  });
+  configRef.current = {
+    resolvedMapOptions,
+    panoContainerId,
+    shareContainerId,
+    shouldRenderShare,
+  };
+
+  const initializedRef = useRef(false);
+
   useEffect(() => {
     if (!isBrowser()) return;
-    if (scriptStatus !== "ready" || !mapRef.current || mapInstance) return;
+    if (scriptStatus !== "ready" || !mapRef.current) return;
+    // Initialize only once per mount — never re-create the map on re-render.
+    if (initializedRef.current) return;
 
     if (!accessToken) {
       setError("GalliMaps accessToken is required (see the docs).");
       return;
     }
 
+    const {
+      resolvedMapOptions: mapConfig,
+      panoContainerId: panoIdNow,
+      shareContainerId: shareIdNow,
+      shouldRenderShare: withShare,
+    } = configRef.current;
+
+    initializedRef.current = true;
     setLoading(true);
     try {
-      if (typeof resolvedMapOptions.container === "string") {
-        mapRef.current.id = resolvedMapOptions.container;
+      if (typeof mapConfig.container === "string") {
+        mapRef.current.id = mapConfig.container;
       }
 
       const options: GallimapOptions = {
         accessToken,
-        map: { ...resolvedMapOptions },
+        map: { ...mapConfig },
         customClickFunctions: [handleMapClick],
       };
 
-      if (shouldRenderPano && panoRef.current) {
-        panoRef.current.id = panoContainerId;
-        options.pano = { container: panoContainerId };
+      // The plugin constructor requires a `pano` container. We always render
+      // one (hidden unless requested) so initialization never crashes.
+      if (panoRef.current) {
+        panoRef.current.id = panoIdNow;
+        options.pano = { container: panoIdNow };
       }
-      if (shouldRenderShare && shareRef.current) {
-        shareRef.current.id = shareContainerId;
-        options.share = { container: shareContainerId };
+      if (withShare && shareRef.current) {
+        shareRef.current.id = shareIdNow;
+        options.share = { container: shareIdNow };
       }
 
       const gallimap: GalliMapPlugin = new window.GalliMapPlugin(options);
       setMapInstance(gallimap);
       setError(null);
-      onMapInit?.(gallimap);
+      onMapInitRef.current?.(gallimap);
     } catch (err) {
+      initializedRef.current = false;
       console.error("GalliMaps initialization failed:", err);
       setError(err instanceof Error ? err.message : "Failed to initialize map");
     } finally {
       setLoading(false);
     }
 
-    return () => setMapInstance(null);
-  }, [
-    scriptStatus,
-    accessToken,
-    resolvedMapOptions,
-    panoContainerId,
-    shareContainerId,
-    shouldRenderPano,
-    shouldRenderShare,
-    mapInstance,
-    setMapInstance,
-    handleMapClick,
-    onMapInit,
-  ]);
+    return () => {
+      initializedRef.current = false;
+      setMapInstance(null);
+    };
+    // Init depends only on stable inputs; config/callbacks are read via refs.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scriptStatus, accessToken, scriptUrl]);
 
   if (!isBrowser()) return null;
 
@@ -171,9 +197,12 @@ const Gallimap: React.FC<GallimapProps> = ({
 
       <div ref={mapRef} style={mapStyle} className="gallimap" />
 
-      {shouldRenderPano && (
-        <div ref={panoRef} style={panoStyle} className="gallimap-pano" />
-      )}
+      {/* Always mounted: the plugin requires a pano container. Hidden unless requested. */}
+      <div
+        ref={panoRef}
+        style={shouldRenderPano ? panoStyle : { display: "none" }}
+        className="gallimap-pano"
+      />
       {shouldRenderShare && (
         <div ref={shareRef} style={shareStyle} className="gallimap-share" />
       )}
