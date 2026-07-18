@@ -14,13 +14,13 @@ Type-safe React bindings for [GalliMaps](https://gallimap.com/) — Nepal's mapp
 
 ## Features
 
-- 🧭 **Declarative components** — drop `<Marker>` / `<Polygon>` / `<Search>` as children of `<Gallimap>`.
-- 🌐 **REST APIs** — Autocomplete, Search, Reverse Geocoding, Routing, and Distance via a typed client and hooks.
-- 🪝 **Imperative hooks** — `useGallimapsAPI()` for the map; `useRoute()` / `useReverseGeocode()` / etc. for REST calls with `{ data, error, loading }`.
-- 📦 **First-class TypeScript** — every prop, param, and response is typed; ships `.d.ts`.
-- 📱 **Works everywhere React runs** — the REST layer uses `fetch` (browsers, React Native, Node 18+) with an injectable fetch and configurable base URL.
-- 🛰️ **SSR-safe** — map renders nothing on the server; works with Next.js App Router.
-- 🪶 **Tiny & tree-shakeable** — React is a peer dependency; no other runtime deps.
+- **Declarative components** — drop `<Marker>` / `<Polygon>` / `<Search>` as children of `<Gallimap>`.
+- **REST APIs** — Autocomplete, Search, Reverse Geocoding, Routing, and Distance via a typed client and hooks.
+- **Imperative hooks** — `useGallimapsAPI()` for the map; `useRoute()` / `useReverseGeocode()` / etc. for REST calls with `{ data, error, loading }`.
+- **First-class TypeScript** — every prop, param, and response is typed; ships `.d.ts`.
+- **Works everywhere React runs** — the REST layer uses `fetch` (browsers, React Native, Node 18+) with an injectable fetch and configurable base URL.
+- **SSR-safe** — map renders nothing on the server; works with Next.js App Router.
+- **Tiny & tree-shakeable** — React is a peer dependency; no other runtime deps.
 
 ## Installation
 

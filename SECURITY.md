@@ -6,8 +6,8 @@ Only the latest published major version receives security updates.
 
 | Version | Supported |
 | ------- | --------- |
-| 2.x     | ✅        |
-| < 2.0   | ❌        |
+| 2.x     | Yes       |
+| < 2.0   | No        |
 
 ## Reporting a Vulnerability
 

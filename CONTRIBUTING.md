@@ -1,6 +1,6 @@
 # Contributing to react-gallimaps
 
-First off — thank you for taking the time to contribute! 🎉 This project aims to
+First off — thank you for taking the time to contribute! This project aims to
 be a friendly, well-maintained React wrapper for GalliMaps, and contributions of
 all sizes are welcome: bug reports, docs, tests, and features.
 
@@ -91,4 +91,4 @@ invest time in a PR.
 3. `npm publish` runs `lint`, `type-check`, tests, and a production build via
    `prepublishOnly`.
 
-Thanks again — happy mapping! 🗺️
+Thanks again — happy mapping!
