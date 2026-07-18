@@ -4,6 +4,52 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0]
+
+Adds first-class support for the five officially documented GalliMaps REST
+APIs, so you can search, geocode, and route without a rendered map. Fully
+additive — no breaking changes.
+
+### Added
+
+- **`GalliApiClient`** — a small, typed, `fetch`-based client for the documented
+  REST endpoints: `autocomplete()`, `search()`, `reverseGeocode()`, `route()`,
+  and `distance()`. Framework-agnostic (browser, React Native, Node 18+), with
+  an injectable `fetch` and configurable `baseUrl`.
+- **REST hooks**: `useAutocomplete` and `useSearch` (debounced, abort-safe),
+  plus `useReverseGeocode`, `useRoute`, and `useDistance` (imperative `run()`
+  with `{ data, error, loading }`). `useGalliClient` / `useOptionalGalliClient`
+  expose the client from context.
+- **`GallimapsProvider`** now accepts `accessToken` (and optional `baseUrl`,
+  `fetch`, or a preconfigured `client`) and supplies a memoized `GalliApiClient`
+  to the REST hooks. Map-only usage is unchanged.
+- **`GalliApiError`** with `status`, `code`, redacted `url`, and `body`, plus an
+  `isGalliApiError()` guard.
+- Typed request/response models for every endpoint (e.g. `AutocompleteResult`,
+  `SearchFeatureCollection`, `ReverseGeocodeResult`, `RouteResult`,
+  `DistanceResult`, `TravelMode`).
+
+### Changed
+
+- `<Search>` gained optional `lat`/`lng` props. When a REST client and
+  coordinates are available it uses the REST autocomplete/search APIs (and works
+  without a rendered map); otherwise it falls back to the map plugin as before.
+
+### Fixed
+
+- **Map no longer re-initializes in a loop.** The `<Gallimap>` init effect now
+  runs once per mount and reads config/callbacks via refs, so inline props
+  (e.g. a `center` array literal or an inline `onMapInit`) no longer re-create
+  the map. This eliminates the repeated `Map ready` / `THREE.WebGLRenderer:
+  Context Lost` cycle and the resulting "Maximum update depth exceeded" warning.
+- **Map initialization no longer crashes on the default (no-pano) case.** The
+  plugin constructor requires both a nested `map` option and a `pano` container;
+  `<Gallimap>` now always passes `{ map: {...} }` and mounts a `pano` container
+  (hidden unless requested), fixing `TypeError: Cannot read properties of
+  undefined (reading 'container')`.
+- `<Search>` callbacks (`onSelect`/`onResults`) are held in refs so inline
+  handlers can't retrigger the debounced search.
+
 ## [2.0.0]
 
 A maintenance-focused refactor that fixes the marker pipeline and prepares the

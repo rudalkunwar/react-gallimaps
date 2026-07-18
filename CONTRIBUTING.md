@@ -29,9 +29,12 @@ npm run build
 
 ```
 src/
+├── api/          # GalliApiClient (REST) + endpoints, errors, request/response types
 ├── components/   # Gallimap, Marker, Polygon, Search
-├── context/      # GallimapsProvider + useGallimaps (map instance + marker registry)
-├── hooks/        # useGallimapsAPI (imperative API), useScript (script loader)
+├── context/      # GallimapsProvider + useGallimaps (map instance, marker registry, REST client)
+├── hooks/        # Map hooks (useGallimapsAPI, useScript) + REST hooks
+│                 #   (useAutocomplete, useSearch, useReverseGeocode, useRoute,
+│                 #    useDistance, useGalliClient)
 ├── types/        # Public + native plugin types
 ├── utils/        # isBrowser and other small helpers
 └── index.ts      # Public entry point

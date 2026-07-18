@@ -5,4 +5,5 @@ export { default as Search } from "./Search";
 
 // Context + hooks
 export { GallimapsProvider, useGallimaps } from "../context/GallimapsContext";
+export type { GallimapsProviderProps } from "../context/GallimapsContext";
 export { useGallimapsAPI } from "../hooks/useGallimapsAPI";

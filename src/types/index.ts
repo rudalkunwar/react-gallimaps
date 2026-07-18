@@ -1,4 +1,5 @@
 import type React from "react";
+import type { GalliApiClient } from "../api/client";
 
 /**
  * Map configuration that mirrors the official GalliMaps `map` option object.
@@ -13,7 +14,8 @@ export interface MapOptions {
 }
 
 /**
- * Options passed to the `GalliMapPlugin` constructor.
+ * Options passed to the `GalliMapPlugin` constructor. Mirrors the official
+ * (nested) shape: `{ accessToken, map: {...}, pano: {...} }`.
  */
 export interface GallimapOptions {
   accessToken: string;
@@ -129,4 +131,9 @@ export interface GallimapsContextType {
   setMapInstance: (map: GalliMapPlugin | null) => void;
   /** Registry of mounted markers, keyed by an auto-generated id. */
   markersRef: React.MutableRefObject<Map<string, MarkerData>>;
+  /**
+   * Client for the GalliMaps REST APIs, or `null` when the provider was not
+   * given an `accessToken`/`client`. Access it via `useGalliClient()`.
+   */
+  apiClient: GalliApiClient | null;
 }

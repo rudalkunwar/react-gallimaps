@@ -53,6 +53,15 @@ export interface SearchProps {
   onResults?: (results: SearchResult[]) => void;
   placeholder?: string;
   className?: string;
+  /**
+   * Latitude used for proximity ordering. When provided together with `lng`
+   * and a REST client (via `<GallimapsProvider accessToken>`), the component
+   * uses the REST autocomplete API and works without a rendered map. Otherwise
+   * it falls back to the map plugin's search.
+   */
+  lat?: number;
+  /** Longitude counterpart to {@link SearchProps.lat}. */
+  lng?: number;
 }
 
 /** A single autocomplete result. The GalliMaps API returns loosely-typed
