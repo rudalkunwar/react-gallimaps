@@ -113,10 +113,38 @@ describe("useGallimapsAPI", () => {
     expect(drawn.geoJson.geometry.type).toBe("Polygon");
     expect(drawn.geoJson.geometry.coordinates).toEqual([
       [
-        [27.7, 85.3],
-        [27.71, 85.31],
+        [85.3, 27.7],
+        [85.31, 27.71],
       ],
     ]);
+  });
+
+  it("converts LineString and Point coordinates to GeoJSON lng/lat order", () => {
+    const { api, ctx } = setup();
+    const { plugin, calls } = createFakePlugin();
+    act(() => ctx.current!.setMapInstance(plugin));
+
+    act(() => {
+      api.current!.drawPolygon({
+        name: "line",
+        type: "LineString",
+        coordinates: [
+          [27.7, 85.3],
+          [27.71, 85.31],
+        ],
+      });
+      api.current!.drawPolygon({
+        name: "point",
+        type: "Point",
+        coordinates: [[27.7, 85.3]],
+      });
+    });
+
+    expect(calls.drawPolygon[0].geoJson.geometry.coordinates).toEqual([
+      [85.3, 27.7],
+      [85.31, 27.71],
+    ]);
+    expect(calls.drawPolygon[1].geoJson.geometry.coordinates).toEqual([85.3, 27.7]);
   });
 
   it("returns only array results from autocomplete", async () => {
