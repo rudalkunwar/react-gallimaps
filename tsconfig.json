@@ -13,7 +13,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": false,
-    "jsx": "react-jsx",
+    "jsx": "react",
     "declaration": true,
     "declarationMap": true,
     "outDir": "./dist",
