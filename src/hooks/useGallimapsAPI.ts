@@ -70,9 +70,9 @@ export const useGallimapsAPI = (): GallimapsAPIHook => {
   );
 
   const autoCompleteSearch = useCallback(
-    async (searchText: string): Promise<unknown[]> => {
+    async (searchText: string, lat?: number, lng?: number): Promise<unknown[]> => {
       if (!mapInstance) return [];
-      const results = await mapInstance.autoCompleteSearch(searchText);
+      const results = await mapInstance.autoCompleteSearch(searchText, lat, lng);
       return Array.isArray(results) ? results : [];
     },
     [mapInstance],
