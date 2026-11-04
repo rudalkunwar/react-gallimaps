@@ -11,6 +11,10 @@ export default defineConfig({
   treeshake: true,
   // Libraries ship readable code; the consuming app's bundler minifies.
   minify: false,
-  // React (and its JSX runtime) is a peer dependency — never bundle it.
+  // Compile JSX with the classic runtime so React 16.8 (the advertised
+  // minimum) does not need `react/jsx-runtime`.
+  jsxFactory: "React.createElement",
+  jsxFragment: "React.Fragment",
+  // React is a peer dependency — never bundle it.
   external: ["react", "react-dom"],
 });
