@@ -10,7 +10,7 @@ const createFakePlugin = () => {
     displayPinMarker: [] as GalliMarkerOptions[],
     drawPolygon: [] as GalliPolygonOptions[],
     removePolygon: [] as string[],
-    autoComplete: [] as string[],
+    autoComplete: [] as Array<{ text: string; lat?: number; lng?: number }>,
   };
   const plugin: GalliMapPlugin = {
     displayPinMarker: (opts) => {
@@ -23,8 +23,8 @@ const createFakePlugin = () => {
       return { id: "polygon" };
     },
     removePolygon: (name) => calls.removePolygon.push(name),
-    autoCompleteSearch: async (text) => {
-      calls.autoComplete.push(text);
+    autoCompleteSearch: async (text, lat, lng) => {
+      calls.autoComplete.push({ text, lat, lng });
       return [{ name: "Kathmandu" }];
     },
     searchData: async () => ({ ok: true }),
@@ -127,5 +127,15 @@ describe("useGallimapsAPI", () => {
     const results = await api.current!.autoCompleteSearch("kat");
     expect(results).toEqual([{ name: "Kathmandu" }]);
     expect(api.current!.isReady).toBe(true);
+  });
+
+  it("forwards optional coordinates to the plugin autocomplete", async () => {
+    const { api, ctx } = setup();
+    const { plugin, calls } = createFakePlugin();
+    act(() => ctx.current!.setMapInstance(plugin));
+
+    await api.current!.autoCompleteSearch("pok", 28.2096, 83.9856);
+
+    expect(calls.autoComplete).toEqual([{ text: "pok", lat: 28.2096, lng: 83.9856 }]);
   });
 });
