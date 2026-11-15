@@ -1,0 +1,72 @@
+[
+ {
+  "file": "docs/assets/aerial-panoramic-view-of-kathmandu-valley-on.jpg",
+  "media": "image",
+  "ref": "openverse:c36fcef2-bbd2-456e-ab4c-3eb0ab48c5b9",
+  "title": "Aerial panoramic view of Kathmandu Valley on a misty day",
+  "creator": "shirishpoudel07",
+  "creatorUrl": "https://sirishpdl.com.np/",
+  "date": null,
+  "license": "CC0",
+  "licenseCode": "cc0",
+  "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+  "creditRequired": false,
+  "page": "https://wordpress.org/photos/photo/5686a27021/",
+  "via": "WordPress Photo Directory",
+  "image": "https://pd.w.org/2026/06/5686a270214c65dc8.96366610-2048x1536.jpg",
+  "width": 2048,
+  "height": 1536,
+  "bytes": 445379,
+  "credit": "\"Aerial panoramic view of Kathmandu Valley on a misty day\" by shirishpoudel07, CC0, via WordPress Photo Directory",
+  "notes": [],
+  "saved": "2026-11-15T03:51:46.795Z"
+ },
+ {
+  "file": "docs/assets/boudha-stupa-2018-04.jpg",
+  "media": "image",
+  "ref": "commons:73099797",
+  "title": "Boudha Stupa 2018 04",
+  "creator": "Nabin K. Sapkota",
+  "creatorUrl": null,
+  "date": "2018-06-16",
+  "license": "CC BY-SA 4.0",
+  "licenseCode": "by-sa",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+  "creditRequired": true,
+  "page": "https://commons.wikimedia.org/wiki/File:Boudha_Stupa_2018_04.jpg",
+  "via": "Wikimedia Commons",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/44/Boudha_Stupa_2018_04.jpg/1920px-Boudha_Stupa_2018_04.jpg",
+  "width": 1920,
+  "height": 1280,
+  "bytes": 515631,
+  "credit": "\"Boudha Stupa 2018 04\" by Nabin K. Sapkota, CC BY-SA 4.0, via Wikimedia Commons",
+  "notes": [
+   "Share-alike: an altered version (recoloured, combined with other pictures) must be shared under the same licence."
+  ],
+  "saved": "2026-11-15T03:51:49.218Z"
+ },
+ {
+  "file": "docs/assets/patan-map-of-the-center.jpg",
+  "media": "image",
+  "ref": "openverse:b9080d5f-a576-4ca2-b79c-8822a08695b4",
+  "title": "Patan, map of the Center",
+  "creator": "Grentidez",
+  "creatorUrl": "https://commons.wikimedia.org/w/index.php?title=User:Grentidez&action=edit&redlink=1",
+  "date": null,
+  "license": "CC BY-SA 4.0",
+  "licenseCode": "by-sa",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "creditRequired": true,
+  "page": "https://commons.wikimedia.org/w/index.php?curid=65340476",
+  "via": "Wikimedia Commons",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/76/Patan%2C_map_of_the_Center.JPG/1920px-Patan%2C_map_of_the_Center.JPG",
+  "width": 1920,
+  "height": 1440,
+  "bytes": 735632,
+  "credit": "\"Patan, map of the Center\" by Grentidez, CC BY-SA 4.0, via Wikimedia Commons",
+  "notes": [
+   "Share-alike: an altered version (recoloured, combined with other pictures) must be shared under the same licence."
+  ],
+  "saved": "2026-11-15T03:51:57.796Z"
+ }
+]
