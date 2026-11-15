@@ -10,6 +10,9 @@ By participating, you agree to abide by our [Code of Conduct](./CODE_OF_CONDUCT.
 
 ## Getting started
 
+You need **Node 18+** and npm 9+. The repository's `.nvmrc` pins the development
+version (Node 20).
+
 ```bash
 # 1. Fork and clone
 git clone https://github.com/<your-username>/react-gallimaps.git
@@ -20,6 +23,7 @@ npm install
 
 # 3. Make sure everything is green before you start
 npm run lint
+npm run format:check
 npm run type-check
 npm test
 npm run build
@@ -47,6 +51,7 @@ src/
 3. Run the full check suite:
    ```bash
    npm run lint
+   npm run format:check
    npm run type-check
    npm test
    npm run build
@@ -54,6 +59,22 @@ src/
 4. Format your code: `npm run format`.
 5. Commit using clear, conventional messages (e.g. `fix: restore map center after marker add`).
 6. Open a Pull Request against `master` and fill in the template.
+
+`master` is protected: changes land through a pull request after CI passes.
+The CI matrix covers Node 18, 20, and 22, and imports the built package with the
+minimum supported React (16.8).
+
+## Documentation site
+
+The package site lives in `docs/` as plain HTML, CSS, and JavaScript — there is
+no build step. Preview it locally with:
+
+```bash
+npx serve docs
+```
+
+Pushing changes under `docs/` to `master` deploys the site through the
+`.github/workflows/pages.yml` workflow.
 
 ## Coding guidelines
 
@@ -86,9 +107,23 @@ invest time in a PR.
 
 ## Releasing (maintainers)
 
-1. Update `CHANGELOG.md`.
-2. Bump the version in `package.json` (`npm version <patch|minor|major>`).
-3. `npm publish` runs `lint`, `type-check`, tests, and a production build via
-   `prepublishOnly`.
+1. Update `CHANGELOG.md` and the README's "New in" note.
+2. Bump the version in `package.json` (`npm version <patch|minor|major> --no-git-tag-version`).
+3. Open a release PR. `master` is protected, so the release lands through a
+   pull request with green CI.
+4. Tag the merged commit and push the tag:
+   ```bash
+   git tag -a vX.Y.Z -m "vX.Y.Z"
+   git push origin vX.Y.Z
+   ```
+5. Check the audit gate, then publish:
+   ```bash
+   npm audit --omit=dev
+   npm publish
+   ```
+   `prepublishOnly` runs lint, type-check, tests, and a production build.
+6. Confirm the docs deployment at
+   https://rudalkunwar.github.io/react-gallimaps/ and publish the GitHub release
+   notes for the tag.
 
 Thanks again — happy mapping!

@@ -566,7 +566,6 @@ export default function App() {
   accessToken={token}
   center={[27.7172, 85.324]}
   zoom={14}
-  clickable
 &gt;
   &lt;Marker position={[27.7172, 85.324]} color="red" /&gt;
   &lt;Polygon
@@ -822,7 +821,7 @@ function SearchBox() {
             <div class="ref-row">
               <code class="ref-name">&lt;Search&gt;</code>
               <p>Keyboard-operable combobox with REST and map-plugin modes.</p>
-              <code class="ref-props">onSelect, onResults, onError, lat, lng, ariaLabel</code>
+              <code class="ref-props">onSelect, onResults, onError, placeholder, ariaLabel, className, lat, lng</code>
             </div>
           </div>
 
@@ -1001,7 +1000,8 @@ function SearchBox() {
               <p class="faq-a-inline" hidden>
                 Yes. 2.2.0 compiles JSX with the classic runtime, so the build no
                 longer imports react/jsx-runtime (React 16.14+). CI imports the
-                package against React 16.8.6.
+                package against React 16.8.6, and the development suite runs
+                React 19.
               </p>
             </div>
 
