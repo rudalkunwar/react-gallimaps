@@ -68,6 +68,8 @@ export interface GalliMapPlugin {
   searchData: (searchText: string) => Promise<unknown>;
   drawPolygon: (options: GalliPolygonOptions) => unknown;
   removePolygon: (name: string) => void;
+  /** Remove the map and release its DOM/WebGL resources. */
+  destroy?: () => void;
   getCenter?: () => [number, number];
   setCenter?: (center: [number, number]) => void;
 }

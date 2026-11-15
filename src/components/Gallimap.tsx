@@ -146,6 +146,7 @@ const Gallimap: React.FC<GallimapProps> = ({
 
     initializedRef.current = true;
     setLoading(true);
+    let gallimap: GalliMapPlugin | null = null;
     try {
       if (typeof mapConfig.container === "string") {
         mapRef.current.id = mapConfig.container;
@@ -168,7 +169,7 @@ const Gallimap: React.FC<GallimapProps> = ({
         options.share = { container: shareIdNow };
       }
 
-      const gallimap: GalliMapPlugin = new window.GalliMapPlugin(options);
+      gallimap = new window.GalliMapPlugin(options);
       setMapInstance(gallimap);
       setError(null);
       onMapInitRef.current?.(gallimap);
@@ -183,6 +184,11 @@ const Gallimap: React.FC<GallimapProps> = ({
     return () => {
       initializedRef.current = false;
       setMapInstance(null);
+      // The plugin owns a MapLibre instance. Without destroy(), re-running this
+      // effect (e.g. on an accessToken change) leaves the old canvas and
+      // controls in the container alongside the new map.
+      gallimap?.destroy?.();
+      gallimap = null;
     };
     // Init depends only on stable inputs; config/callbacks are read via refs.
     // eslint-disable-next-line react-hooks/exhaustive-deps
