@@ -10,17 +10,21 @@ const toGalliMarker = (options: MarkerOptions): GalliMarkerOptions => ({
   color: options.color,
 });
 
+/** Convert a public `[lat, lng]` pair to a GeoJSON `[lng, lat]` pair. */
+const toLngLat = ([lat, lng]: [number, number]): [number, number] => [lng, lat];
+
 /** Maps a React-friendly `PolygonOptions` to the native GeoJSON-based shape. */
 const toGalliPolygon = (options: PolygonOptions): GalliPolygonOptions => {
   const { coordinates, name, type = "Polygon", style = {} } = options;
+  const geoJsonCoordinates = coordinates.map(toLngLat);
 
-  let geoJsonCoordinates: unknown;
+  let geoJsonGeometry: unknown;
   if (type === "Polygon") {
-    geoJsonCoordinates = [coordinates];
+    geoJsonGeometry = [geoJsonCoordinates];
   } else if (type === "LineString") {
-    geoJsonCoordinates = coordinates;
+    geoJsonGeometry = geoJsonCoordinates;
   } else {
-    geoJsonCoordinates = coordinates[0] ?? [0, 0];
+    geoJsonGeometry = geoJsonCoordinates[0] ?? [0, 0];
   }
 
   return {
@@ -33,7 +37,7 @@ const toGalliPolygon = (options: PolygonOptions): GalliPolygonOptions => {
     latLng: coordinates[0] ?? [0, 0],
     geoJson: {
       type: "Feature",
-      geometry: { type, coordinates: geoJsonCoordinates },
+      geometry: { type, coordinates: geoJsonGeometry },
     },
   };
 };
