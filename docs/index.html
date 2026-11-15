@@ -1,0 +1,1171 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>react-gallimaps — React bindings for GalliMaps</title>
+    <meta
+      name="description"
+      content="Declarative map components and typed REST hooks for GalliMaps, Nepal's mapping platform. Search, geocode, and route with or without a rendered map."
+    />
+    <meta name="theme-color" content="#0a0d14" />
+    <link rel="canonical" href="https://rudalkunwar.github.io/react-gallimaps/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="react-gallimaps — React bindings for GalliMaps" />
+    <meta
+      property="og:description"
+      content="Declarative map components and typed REST hooks for Nepal's mapping platform."
+    />
+    <meta property="og:url" content="https://rudalkunwar.github.io/react-gallimaps/" />
+    <meta
+      property="og:image"
+      content="https://rudalkunwar.github.io/react-gallimaps/assets/aerial-panoramic-view-of-kathmandu-valley-on.jpg"
+    />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Stack+Sans+Headline:wght@300&family=Stack+Sans+Text:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+    <script>
+      document.documentElement.classList.add("js");
+    </script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+
+    <header class="nav">
+      <a class="wordmark" href="#top">react-gallimaps</a>
+      <nav class="nav-links" aria-label="Main">
+        <a href="#guide">Guide</a>
+        <a href="#reference">Reference</a>
+        <a href="#faq">FAQ</a>
+        <a
+          class="nav-action"
+          href="https://github.com/rudalkunwar/react-gallimaps"
+          target="_blank"
+          rel="noreferrer"
+          >GitHub <span aria-hidden="true">↗</span></a
+        >
+      </nav>
+    </header>
+
+    <main id="main">
+      <!-- Hero -->
+      <section class="hero" id="top">
+        <div class="hero-copy" data-reveal>
+          <h1>The React layer for GalliMaps.</h1>
+          <p class="hero-lede">
+            Declarative map components and typed REST hooks for Nepal’s mapping
+            platform — search, geocode, and route with or without a rendered map.
+          </p>
+
+          <div class="install-line">
+            <code id="install-command">npm install react-gallimaps</code>
+            <button class="copy" type="button" data-copy="#install-command">
+              Copy
+            </button>
+          </div>
+
+          <div class="hero-actions">
+            <a class="button" href="#guide">Read the guide</a>
+            <a
+              class="text-link"
+              href="https://www.npmjs.com/package/react-gallimaps"
+              target="_blank"
+              rel="noreferrer"
+              >npm package <span aria-hidden="true">↗</span></a
+            >
+          </div>
+
+          <p class="hero-meta">
+            v2.2.0 <span aria-hidden="true">·</span> MIT
+            <span aria-hidden="true">·</span> React 16.8+
+            <span aria-hidden="true">·</span> no runtime dependencies
+          </p>
+        </div>
+
+        <div class="hero-stage" aria-label="Map composer">
+          <div class="composer ui" data-ui>
+            <div class="ui-bar">
+              <span>Compose your map</span>
+              <button class="copy copy-dark" type="button" data-copy="#composer-code">
+                Copy code
+              </button>
+            </div>
+
+            <div class="ui-body">
+              <div class="composer-controls">
+                <label class="field">
+                  <span>Center</span>
+                  <select id="preset">
+                    <option value="27.7172,85.324" selected>Kathmandu</option>
+                    <option value="27.6736,85.325">Patan</option>
+                    <option value="27.7215,85.362">Boudhanath</option>
+                    <option value="28.2096,83.9856">Pokhara</option>
+                  </select>
+                </label>
+
+                <label class="field">
+                  <span>Zoom <output id="zoom-value" for="zoom">14</output></span>
+                  <input id="zoom" type="range" min="10" max="18" value="14" />
+                </label>
+
+                <div class="toggles" role="group" aria-label="Map children">
+                  <label class="toggle"
+                    ><input id="with-marker" type="checkbox" checked /> Marker</label
+                  >
+                  <label class="toggle"
+                    ><input id="with-polygon" type="checkbox" checked /> Polygon</label
+                  >
+                  <label class="toggle"
+                    ><input id="with-search" type="checkbox" checked /> Search</label
+                  >
+                </div>
+              </div>
+
+              <p class="coords" id="coords">27.7172° N, 85.3240° E</p>
+
+              <pre class="code composer-code"><code id="composer-code"></code></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- What's inside -->
+      <section class="section showcase" id="inside">
+        <div class="section-intro" data-reveal>
+          <h2>Three pieces, one package.</h2>
+          <p>
+            Components for the map, hooks for the REST APIs, and a typed client
+            underneath. Use one layer or all three.
+          </p>
+        </div>
+
+        <div class="showcase-grid">
+          <div class="showcase-list" role="tablist" aria-label="What's inside">
+            <button
+              class="showcase-tab is-active"
+              id="tab-map"
+              role="tab"
+              aria-selected="true"
+              aria-controls="panel-map"
+              data-panel="map"
+            >
+              <span class="showcase-name">Map components</span>
+              <span class="showcase-desc"
+                >Gallimap, Marker, Polygon, and an accessible Search box.</span
+              >
+            </button>
+            <button
+              class="showcase-tab"
+              id="tab-rest"
+              role="tab"
+              aria-selected="false"
+              aria-controls="panel-rest"
+              data-panel="rest"
+            >
+              <span class="showcase-name">REST hooks</span>
+              <span class="showcase-desc"
+                >Autocomplete, search, reverse geocode, route, and distance.</span
+              >
+            </button>
+            <button
+              class="showcase-tab"
+              id="tab-client"
+              role="tab"
+              aria-selected="false"
+              aria-controls="panel-client"
+              data-panel="client"
+            >
+              <span class="showcase-name">Typed client</span>
+              <span class="showcase-desc"
+                >The same five endpoints without React, with rich errors.</span
+              >
+            </button>
+          </div>
+
+          <div class="showcase-stage">
+            <div
+              class="sheet"
+              id="panel-map"
+              role="tabpanel"
+              aria-labelledby="tab-map"
+            >
+              <div class="map-ui ui" data-ui>
+                <div class="ui-bar">
+                  <span>Kathmandu</span>
+                  <span class="ui-muted">zoom 14</span>
+                </div>
+
+                <div class="search-ui">
+                  <label class="sr-only" for="preview-search"
+                    >Search sample locations</label
+                  >
+                  <input
+                    id="preview-search"
+                    type="text"
+                    value="durbar"
+                    autocomplete="off"
+                    placeholder="Search locations"
+                  />
+                  <ul id="preview-results" aria-label="Sample results">
+                    <li>
+                      <span>Kathmandu Durbar Square</span>
+                      <span>0.4 km</span>
+                    </li>
+                    <li>
+                      <span>Durbar Marg</span>
+                      <span>1.8 km</span>
+                    </li>
+                    <li>
+                      <span>Patan Durbar Square</span>
+                      <span>4.6 km</span>
+                    </li>
+                  </ul>
+                  <p class="ui-note">Sample results, shaped like the API response.</p>
+                </div>
+
+                <div class="map-fragment">
+                  <svg viewBox="0 0 560 300" aria-hidden="true">
+                    <rect width="560" height="300" fill="#0f1420" />
+                    <g fill="#171e2a">
+                      <rect x="24" y="24" width="118" height="66" />
+                      <rect x="168" y="24" width="96" height="66" />
+                      <rect x="292" y="18" width="120" height="72" />
+                      <rect x="438" y="24" width="98" height="66" />
+                      <rect x="24" y="118" width="118" height="74" />
+                      <rect x="168" y="118" width="96" height="74" />
+                      <rect x="292" y="112" width="120" height="86" />
+                      <rect x="438" y="118" width="98" height="74" />
+                      <rect x="24" y="218" width="118" height="60" />
+                      <rect x="168" y="218" width="96" height="60" />
+                      <rect x="292" y="224" width="120" height="54" />
+                      <rect x="438" y="218" width="98" height="60" />
+                    </g>
+                    <rect x="292" y="112" width="120" height="86" fill="#14301f" />
+                    <rect x="24" y="218" width="118" height="60" fill="#12283a" />
+                    <g stroke="#2a3444" stroke-width="7" fill="none">
+                      <path d="M0 105 H560" />
+                      <path d="M0 202 H560" />
+                      <path d="M154 0 V300" />
+                      <path d="M278 0 V300" />
+                      <path d="M424 0 V300" />
+                    </g>
+                    <g
+                      fill="#9aa4b5"
+                      font-size="11"
+                      font-family="Stack Sans Text, system-ui, sans-serif"
+                    >
+                      <text x="40" y="58">Thamel</text>
+                      <text x="306" y="154">Durbar Marg</text>
+                      <text x="450" y="248">Baneshwor</text>
+                      <text x="180" y="280">New Road</text>
+                    </g>
+                  </svg>
+
+                  <span class="map-pin pin-a" aria-hidden="true"></span>
+                  <span class="map-pin pin-b" aria-hidden="true"></span>
+                  <span class="map-pin pin-c is-active" aria-hidden="true"></span>
+                  <span class="pin-label">Durbar Square</span>
+                </div>
+
+                <p class="ui-note ui-note-bottom">
+                  The whole pin is clickable. Adding markers restores the viewport.
+                </p>
+              </div>
+            </div>
+
+            <div
+              class="sheet"
+              id="panel-rest"
+              role="tabpanel"
+              aria-labelledby="tab-rest"
+              hidden
+            >
+              <div class="rest-ui ui" data-ui>
+                <div class="ui-bar">
+                  <span>useRoute()</span>
+                  <span class="ui-muted">sample response</span>
+                </div>
+
+                <div class="ui-body">
+                  <pre class="code"><code>const { run, data, loading } = useRoute();
+
+run({
+  mode: "driving",
+  srcLat: 27.7172, srcLng: 85.324,
+  dstLat: 27.6736, dstLng: 85.325,
+});</code></pre>
+
+                  <div class="route-result">
+                    <div class="route-metric">
+                      <span class="metric">4.8</span
+                      ><span class="unit">km</span>
+                    </div>
+                    <div class="route-metric">
+                      <span class="metric">16</span
+                      ><span class="unit">min</span>
+                    </div>
+                    <span class="route-mode">driving</span>
+                  </div>
+
+                  <div class="mode-rows">
+                    <div class="mode-row is-active">
+                      <span>Driving</span><span>4.8 km</span><span>16 min</span>
+                    </div>
+                    <div class="mode-row">
+                      <span>Cycling</span><span>4.4 km</span><span>21 min</span>
+                    </div>
+                    <div class="mode-row">
+                      <span>Walking</span><span>4.1 km</span><span>54 min</span>
+                    </div>
+                  </div>
+
+                  <p class="ui-note">
+                    Typed results. The next run aborts the previous request.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="sheet"
+              id="panel-client"
+              role="tabpanel"
+              aria-labelledby="tab-client"
+              hidden
+            >
+              <div class="client-ui ui" data-ui>
+                <div class="ui-bar">
+                  <span>GalliApiClient</span>
+                  <span class="ui-muted">type-safe</span>
+                </div>
+
+                <div class="ui-body">
+                  <pre class="code"><code>const client = new GalliApiClient({
+  accessToken: process.env.GALLIMAPS_TOKEN!,
+});
+
+const routes = await client.route({
+  mode: "walking",
+  srcLat: 27.7172, srcLng: 85.324,
+  dstLat: 27.7215, dstLng: 85.362,
+});
+
+routes[0].distance; // number, metres</code></pre>
+
+                  <div class="error-card">
+                    <span class="error-label">GalliApiError</span>
+                    <ul>
+                      <li><code>status</code> — the HTTP status</li>
+                      <li><code>code</code> — NETWORK, PARSE, or HTTP</li>
+                      <li><code>url</code> — token redacted</li>
+                      <li><code>body</code> — the raw response</li>
+                    </ul>
+                  </div>
+
+                  <p class="ui-note">
+                    Works in browsers, React Native, and Node 18+.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Built for Nepal -->
+      <section class="section world" id="nepal">
+        <div class="world-copy" data-reveal>
+          <h2>Built for Nepal.</h2>
+          <p>
+            Kathmandu is the default center, and the REST APIs order results by
+            proximity. GalliMaps is Nepal’s mapping platform; this package gives
+            it a typed React surface without hiding how it works.
+          </p>
+        </div>
+
+        <div class="world-grid">
+          <figure class="world-photo photo-wide" data-reveal>
+            <img
+              src="./assets/aerial-panoramic-view-of-kathmandu-valley-on.jpg"
+              width="2048"
+              height="1536"
+              alt="Aerial view of the Kathmandu valley under a pale, misty sky."
+              decoding="async"
+            />
+            <figcaption>
+              The Kathmandu valley. Default center: 27.7172, 85.324.
+            </figcaption>
+          </figure>
+
+          <figure class="world-photo" data-reveal style="--d: 80ms">
+            <img
+              src="./assets/boudha-stupa-2018-04.jpg"
+              width="1920"
+              height="1280"
+              alt="Boudhanath Stupa with prayer flags above its white dome."
+              loading="lazy"
+              decoding="async"
+            />
+            <figcaption>Boudhanath, one of the places the sample search returns.</figcaption>
+          </figure>
+
+          <figure class="world-photo" data-reveal style="--d: 80ms">
+            <img
+              src="./assets/patan-map-of-the-center.jpg"
+              width="1920"
+              height="1440"
+              alt="A printed map of Patan's center with temples and neighbourhoods marked."
+              loading="lazy"
+              decoding="async"
+            />
+            <figcaption>Patan, south of Kathmandu. The map is still the interface.</figcaption>
+          </figure>
+        </div>
+
+        <p class="credits" id="photo-credits">
+          Photographs:
+          <a
+            href="https://wordpress.org/photos/photo/5686a27021/"
+            target="_blank"
+            rel="noreferrer"
+            >Kathmandu valley</a
+          >
+          by shirishpoudel07 (CC0);
+          <a
+            href="https://commons.wikimedia.org/wiki/File:Boudha_Stupa_2018_04.jpg"
+            target="_blank"
+            rel="noreferrer"
+            >Boudha Stupa</a
+          >
+          by Nabin K. Sapkota (CC BY-SA 4.0, cropped);
+          <a
+            href="https://commons.wikimedia.org/w/index.php?curid=65340476"
+            target="_blank"
+            rel="noreferrer"
+            >Patan map</a
+          >
+          by Grentidez (CC BY-SA 4.0, cropped).
+        </p>
+      </section>
+
+      <!-- Guide -->
+      <section class="section guide" id="guide">
+        <div class="section-intro" data-reveal>
+          <h2>From install to a live map.</h2>
+          <p>Three steps. The first two are the map; the third also works without it.</p>
+        </div>
+
+        <div class="guide-grid">
+          <div class="guide-steps">
+            <div class="guide-step is-active" data-step="provider">
+              <h3>
+                <button
+                  class="step-toggle"
+                  type="button"
+                  data-step="provider"
+                  aria-controls="guide-panel-provider"
+                  aria-pressed="true"
+                >
+                  First, wrap the app.
+                </button>
+              </h3>
+              <p>
+                Give the provider your token once. The map and the REST hooks both
+                read it from context, so you do not pass it around.
+              </p>
+              <ul class="step-list">
+                <li>One token for the map and every hook.</li>
+                <li>Inject <code>fetch</code> for tests, Node, or React Native.</li>
+              </ul>
+            </div>
+
+            <div class="guide-step" data-step="map">
+              <h3>
+                <button
+                  class="step-toggle"
+                  type="button"
+                  data-step="map"
+                  aria-controls="guide-panel-map"
+                  aria-pressed="false"
+                >
+                  Second, place the map.
+                </button>
+              </h3>
+              <p>
+                Add children for markers, polygons, and search. Inline props are
+                safe: the map initializes once and keeps its viewport.
+              </p>
+              <ul class="step-list">
+                <li><code>Gallimap</code>, <code>Marker</code>, <code>Polygon</code>, <code>Search</code>.</li>
+                <li>Browser-only, SSR-safe; render it in a client component.</li>
+              </ul>
+            </div>
+
+            <div class="guide-step" data-step="hooks">
+              <h3>
+                <button
+                  class="step-toggle"
+                  type="button"
+                  data-step="hooks"
+                  aria-controls="guide-panel-hooks"
+                  aria-pressed="false"
+                >
+                  Third, call the hooks.
+                </button>
+              </h3>
+              <p>
+                Search, geocode, and route anywhere below the provider. The REST
+                layer needs no rendered map and no extra client setup.
+              </p>
+              <ul class="step-list">
+                <li>Autocomplete, search, and reverse geocode.</li>
+                <li>Route and distance in driving, walking, or cycling.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="guide-stage">
+            <div
+              class="guide-panel is-active"
+              id="guide-panel-provider"
+              data-panel="provider"
+            >
+              <div class="ui" data-ui>
+                <div class="ui-bar">
+                  <span>App.tsx</span><span class="ui-muted">step one</span>
+                </div>
+                <pre class="code"><code>import { GallimapsProvider } from "react-gallimaps";
+
+export default function App() {
+  return (
+    &lt;GallimapsProvider
+      accessToken={process.env.GALLIMAPS_TOKEN!}
+    &gt;
+      &lt;YourMap /&gt;
+    &lt;/GallimapsProvider&gt;
+  );
+}</code></pre>
+              </div>
+            </div>
+
+            <div class="guide-panel" id="guide-panel-map" data-panel="map" hidden>
+              <div class="ui" data-ui>
+                <div class="ui-bar">
+                  <span>YourMap.tsx</span><span class="ui-muted">step two</span>
+                </div>
+                <pre class="code"><code>import {
+  Gallimap, Marker, Polygon, Search,
+} from "react-gallimaps";
+
+&lt;Gallimap
+  accessToken={token}
+  center={[27.7172, 85.324]}
+  zoom={14}
+  clickable
+&gt;
+  &lt;Marker position={[27.7172, 85.324]} color="red" /&gt;
+  &lt;Polygon
+    name="durbar-square"
+    coordinates={[[27.7045, 85.3072], [27.705, 85.308]]}
+  /&gt;
+  &lt;Search lat={27.7172} lng={85.324} /&gt;
+&lt;/Gallimap&gt;</code></pre>
+              </div>
+            </div>
+
+            <div
+              class="guide-panel"
+              id="guide-panel-hooks"
+              data-panel="hooks"
+              hidden
+            >
+              <div class="ui" data-ui>
+                <div class="ui-bar">
+                  <span>SearchBox.tsx</span><span class="ui-muted">step three</span>
+                </div>
+                <pre class="code"><code>import { useAutocomplete } from "react-gallimaps";
+
+function SearchBox() {
+  const { query, setQuery, results, loading } =
+    useAutocomplete({ lat: 27.7172, lng: 85.324 });
+
+  return (
+    &lt;&gt;
+      &lt;input
+        value={query}
+        onChange={(e) =&gt; setQuery(e.target.value)}
+        placeholder="Search Nepal"
+      /&gt;
+      {loading &amp;&amp; &lt;span&gt;Searching…&lt;/span&gt;}
+      &lt;ul&gt;
+        {results.map((place) =&gt; (
+          &lt;li key={place.id}&gt;{place.name}&lt;/li&gt;
+        ))}
+      &lt;/ul&gt;
+    &lt;/&gt;
+  );
+}</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- API command list -->
+      <section class="section commands" id="api">
+        <div class="section-intro" data-reveal>
+          <h2>Every API, one import.</h2>
+          <p>
+            Filter the surface area. Select a row to see what it does before you
+            open the reference.
+          </p>
+        </div>
+
+        <div class="command-shell" data-reveal>
+          <label class="sr-only" for="api-filter">Filter the API</label>
+          <input
+            id="api-filter"
+            class="command-filter"
+            type="search"
+            placeholder="Filter the API"
+            autocomplete="off"
+            spellcheck="false"
+          />
+
+          <div class="command-list" id="command-list">
+            <button class="command-row is-active" type="button" data-kind="component">
+              <span class="command-main">
+                <span class="command-name">&lt;Gallimap&gt;</span>
+                <span class="command-kind">component</span>
+              </span>
+              <span class="command-note"
+                >Declarative map container with center, zoom, pano, share, and click
+                handling.</span
+              >
+            </button>
+
+            <button class="command-row" type="button" data-kind="component">
+              <span class="command-main">
+                <span class="command-name">&lt;Marker&gt;</span>
+                <span class="command-kind">component</span>
+              </span>
+              <span class="command-note"
+                >Pins that keep the viewport and fire onClick from the whole pin, not
+                just its anchor.</span
+              >
+            </button>
+
+            <button class="command-row" type="button" data-kind="component">
+              <span class="command-main">
+                <span class="command-name">&lt;Polygon&gt;</span>
+                <span class="command-kind">component</span>
+              </span>
+              <span class="command-note"
+                >Polygon, LineString, and Point overlays with GeoJSON coordinates in
+                the right order.</span
+              >
+            </button>
+
+            <button class="command-row" type="button" data-kind="component">
+              <span class="command-main">
+                <span class="command-name">&lt;Search&gt;</span>
+                <span class="command-kind">component</span>
+              </span>
+              <span class="command-note"
+                >An accessible combobox that uses the REST API or the map plugin,
+                depending on what you give it.</span
+              >
+            </button>
+
+            <button class="command-row" type="button" data-kind="hook">
+              <span class="command-main">
+                <span class="command-name">useAutocomplete</span>
+                <span class="command-kind">hook</span>
+              </span>
+              <span class="command-note"
+                >Debounced suggestions with abort-safe requests and proximity
+                ordering.</span
+              >
+            </button>
+
+            <button class="command-row" type="button" data-kind="hook">
+              <span class="command-main">
+                <span class="command-name">useRoute</span>
+                <span class="command-kind">hook</span>
+              </span>
+              <span class="command-note"
+                >Typed route geometry, distance, and duration for driving, walking, or
+                cycling.</span
+              >
+            </button>
+
+            <button class="command-row" type="button" data-kind="hook">
+              <span class="command-main">
+                <span class="command-name">useReverseGeocode</span>
+                <span class="command-kind">hook</span>
+              </span>
+              <span class="command-note"
+                >Turn a coordinate pair into an address, with the same
+                data/error/loading shape.</span
+              >
+            </button>
+
+            <button class="command-row" type="button" data-kind="client">
+              <span class="command-main">
+                <span class="command-name">GalliApiClient</span>
+                <span class="command-kind">client</span>
+              </span>
+              <span class="command-note"
+                >The five documented REST endpoints without React, with an injectable
+                fetch.</span
+              >
+            </button>
+          </div>
+
+          <p class="command-empty" id="command-empty" hidden>
+            No API matches that filter.
+          </p>
+
+          <a class="text-link command-link" href="#reference"
+            >Open the full reference <span aria-hidden="true">↓</span></a
+          >
+        </div>
+      </section>
+
+      <!-- Reference -->
+      <section class="section reference" id="reference">
+        <div class="section-intro" data-reveal>
+          <h2>Reference, on one page.</h2>
+          <p>
+            Every prop, hook, and endpoint. The
+            <a
+              href="https://github.com/rudalkunwar/react-gallimaps#api"
+              target="_blank"
+              rel="noreferrer"
+              >README</a
+            >
+            has the long version.
+          </p>
+        </div>
+
+        <div class="reference-shell" data-reveal>
+          <div class="ref-tabs" role="tablist" aria-label="Reference sections">
+            <button
+              class="ref-tab is-active"
+              id="ref-tab-components"
+              role="tab"
+              aria-selected="true"
+              aria-controls="ref-panel-components"
+            >
+              Components
+            </button>
+            <button
+              class="ref-tab"
+              id="ref-tab-hooks"
+              role="tab"
+              aria-selected="false"
+              aria-controls="ref-panel-hooks"
+            >
+              Hooks
+            </button>
+            <button
+              class="ref-tab"
+              id="ref-tab-rest"
+              role="tab"
+              aria-selected="false"
+              aria-controls="ref-panel-rest"
+            >
+              REST client
+            </button>
+            <button
+              class="ref-tab"
+              id="ref-tab-errors"
+              role="tab"
+              aria-selected="false"
+              aria-controls="ref-panel-errors"
+            >
+              Errors
+            </button>
+          </div>
+
+          <div
+            class="ref-panel"
+            id="ref-panel-components"
+            role="tabpanel"
+            aria-labelledby="ref-tab-components"
+          >
+            <div class="ref-row">
+              <code class="ref-name">&lt;GallimapsProvider&gt;</code>
+              <p>Context for the map instance, marker registry, and REST client.</p>
+              <code class="ref-props">accessToken, baseUrl, fetch, client</code>
+            </div>
+            <div class="ref-row">
+              <code class="ref-name">&lt;Gallimap&gt;</code>
+              <p>Map container; loads the plugin in the browser and guards SSR.</p>
+              <code class="ref-props">accessToken, center, zoom, clickable, onMapInit</code>
+            </div>
+            <div class="ref-row">
+              <code class="ref-name">&lt;Marker&gt;</code>
+              <p>Declarative pin. Renders nothing in the DOM itself.</p>
+              <code class="ref-props">position, color, draggable, onClick</code>
+            </div>
+            <div class="ref-row">
+              <code class="ref-name">&lt;Polygon&gt;</code>
+              <p>Polygon, LineString, or Point overlay.</p>
+              <code class="ref-props">name, coordinates, type, style</code>
+            </div>
+            <div class="ref-row">
+              <code class="ref-name">&lt;Search&gt;</code>
+              <p>Keyboard-operable combobox with REST and map-plugin modes.</p>
+              <code class="ref-props">onSelect, onResults, onError, lat, lng, ariaLabel</code>
+            </div>
+          </div>
+
+          <div
+            class="ref-panel"
+            id="ref-panel-hooks"
+            role="tabpanel"
+            aria-labelledby="ref-tab-hooks"
+            hidden
+          >
+            <div class="ref-row">
+              <code class="ref-name">useAutocomplete({ lat, lng })</code>
+              <p>Debounced suggestions; returns query, setQuery, results, loading, error, clear.</p>
+              <code class="ref-props">min 3 chars · 300 ms debounce</code>
+            </div>
+            <div class="ref-row">
+              <code class="ref-name">useSearch({ currentLat, currentLng })</code>
+              <p>Place search returning GeoJSON features with distance in metres.</p>
+              <code class="ref-props">results: SearchFeature[]</code>
+            </div>
+            <div class="ref-row">
+              <code class="ref-name">useReverseGeocode()</code>
+              <p>Imperative address lookup with data, error, loading, run, and reset.</p>
+              <code class="ref-props">run({ lat, lng })</code>
+            </div>
+            <div class="ref-row">
+              <code class="ref-name">useRoute() / useDistance()</code>
+              <p>Routing with geometry, or distance and duration only.</p>
+              <code class="ref-props">run({ mode, srcLat, srcLng, dstLat, dstLng })</code>
+            </div>
+            <div class="ref-row">
+              <code class="ref-name">useGallimapsAPI()</code>
+              <p>Imperative markers, polygons, and search against the map instance.</p>
+              <code class="ref-props">isReady, displayPinMarker, drawPolygon</code>
+            </div>
+            <div class="ref-row">
+              <code class="ref-name">useGalliClient()</code>
+              <p>The typed REST client from context, or a throwing/null variant.</p>
+              <code class="ref-props">useOptionalGalliClient()</code>
+            </div>
+          </div>
+
+          <div
+            class="ref-panel"
+            id="ref-panel-rest"
+            role="tabpanel"
+            aria-labelledby="ref-tab-rest"
+            hidden
+          >
+            <div class="ref-row">
+              <code class="ref-name">client.autocomplete()</code>
+              <p>Suggestions for a partial query, ordered by proximity.</p>
+              <code class="ref-props">GET /search/autocomplete</code>
+            </div>
+            <div class="ref-row">
+              <code class="ref-name">client.search()</code>
+              <p>Full place search relative to a current location.</p>
+              <code class="ref-props">GET /search/currentLocation</code>
+            </div>
+            <div class="ref-row">
+              <code class="ref-name">client.reverseGeocode()</code>
+              <p>Coordinates to an address.</p>
+              <code class="ref-props">GET /reverse/generalReverse</code>
+            </div>
+            <div class="ref-row">
+              <code class="ref-name">client.route()</code>
+              <p>One or more routes between a source and destination.</p>
+              <code class="ref-props">GET /routing</code>
+            </div>
+            <div class="ref-row">
+              <code class="ref-name">client.distance()</code>
+              <p>Distance and duration only, without geometry.</p>
+              <code class="ref-props">GET /routing/distance</code>
+            </div>
+          </div>
+
+          <div
+            class="ref-panel"
+            id="ref-panel-errors"
+            role="tabpanel"
+            aria-labelledby="ref-tab-errors"
+            hidden
+          >
+            <div class="ref-row">
+              <code class="ref-name">GalliApiError</code>
+              <p>Thrown by every client method and surfaced by the hooks.</p>
+              <code class="ref-props">status, code, url, body</code>
+            </div>
+            <div class="ref-row">
+              <code class="ref-name">isGalliApiError(error)</code>
+              <p>A type guard for catch blocks.</p>
+              <code class="ref-props">(error: unknown) =&gt; boolean</code>
+            </div>
+            <div class="ref-row">
+              <code class="ref-name">error.code</code>
+              <p>NETWORK for fetch failures, PARSE for invalid JSON, HTTP for non-2xx.</p>
+              <code class="ref-props">"NETWORK" | "PARSE" | "HTTP"</code>
+            </div>
+            <div class="ref-row">
+              <code class="ref-name">error.url</code>
+              <p>The request URL with the access token replaced by REDACTED.</p>
+              <code class="ref-props">string</code>
+            </div>
+            <div class="ref-row">
+              <code class="ref-name">error.body</code>
+              <p>The raw response body, when one was received.</p>
+              <code class="ref-props">unknown</code>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FAQ -->
+      <section class="section faq" id="faq">
+        <div class="section-intro" data-reveal>
+          <h2>Setup questions.</h2>
+          <p>The things that trip people up first.</p>
+        </div>
+
+        <div class="faq-grid">
+          <div class="faq-list" id="faq-list">
+            <div class="faq-item is-active">
+              <button class="faq-q" type="button" aria-expanded="true">
+                <span class="dot" aria-hidden="true"></span>
+                <span>Do I need an access token?</span>
+              </button>
+              <p class="faq-a-inline" hidden>
+                Yes, for the map and the REST APIs. Create one at gallimap.com and
+                pass it to GallimapsProvider or Gallimap. Placeholder tokens do not
+                load tiles or search results.
+              </p>
+            </div>
+
+            <div class="faq-item">
+              <button class="faq-q" type="button" aria-expanded="false">
+                <span class="dot" aria-hidden="true"></span>
+                <span>Can I use the REST hooks without a map?</span>
+              </button>
+              <p class="faq-a-inline" hidden>
+                Yes. Wrap your tree in GallimapsProvider with an accessToken and call
+                useAutocomplete, useSearch, useReverseGeocode, useRoute, or
+                useDistance. No Gallimap component is required.
+              </p>
+            </div>
+
+            <div class="faq-item">
+              <button class="faq-q" type="button" aria-expanded="false">
+                <span class="dot" aria-hidden="true"></span>
+                <span>Does it work with Next.js and React Native?</span>
+              </button>
+              <p class="faq-a-inline" hidden>
+                The REST client uses fetch and works in browsers, React Native, and
+                Node 18+. The map is browser-only and SSR-safe: it renders nothing on
+                the server, so use a client component or next/dynamic with
+                ssr:false.
+              </p>
+            </div>
+
+            <div class="faq-item">
+              <button class="faq-q" type="button" aria-expanded="false">
+                <span class="dot" aria-hidden="true"></span>
+                <span>Why did my markers move the map?</span>
+              </button>
+              <p class="faq-a-inline" hidden>
+                Fixed in 2.2.0. The plugin flies to every new pin at zoom 20; the
+                wrapper now cancels that animation and restores the previous center
+                and zoom. Marker.onClick also fires from the pin itself.
+              </p>
+            </div>
+
+            <div class="faq-item">
+              <button class="faq-q" type="button" aria-expanded="false">
+                <span class="dot" aria-hidden="true"></span>
+                <span>Is React 16.8 supported?</span>
+              </button>
+              <p class="faq-a-inline" hidden>
+                Yes. 2.2.0 compiles JSX with the classic runtime, so the build no
+                longer imports react/jsx-runtime (React 16.14+). CI imports the
+                package against React 16.8.6.
+              </p>
+            </div>
+
+            <div class="faq-item">
+              <button class="faq-q" type="button" aria-expanded="false">
+                <span class="dot" aria-hidden="true"></span>
+                <span>How do I report a bug?</span>
+              </button>
+              <p class="faq-a-inline" hidden>
+                Open an issue on GitHub with the package version, a minimal
+                reproduction, and the console output. Security reports go through
+                SECURITY.md instead of the public issue tracker.
+              </p>
+            </div>
+          </div>
+
+          <div class="faq-answer" aria-live="polite">
+            <p id="faq-answer-text">
+              Yes, for the map and the REST APIs. Create one at gallimap.com and pass
+              it to GallimapsProvider or Gallimap. Placeholder tokens do not load
+              tiles or search results.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Call to action -->
+      <section class="section cta" id="install">
+        <div class="cta-grid">
+          <div class="cta-copy" data-reveal>
+            <h2 class="cta-heading">
+              Install it with
+              <span class="pm-group" role="group" aria-label="Package manager">
+                <button class="pm is-active" type="button" data-pm="npm">npm</button>
+                <button class="pm" type="button" data-pm="pnpm">pnpm</button>
+                <button class="pm" type="button" data-pm="yarn">yarn</button>
+              </span>
+            </h2>
+
+            <p class="cta-note">
+              Requires a GalliMaps access token for map tiles, search, and routing.
+              <a href="https://gallimap.com/" target="_blank" rel="noreferrer"
+                >Get one at gallimap.com</a
+              >.
+            </p>
+
+            <div class="cta-links">
+              <a
+                class="button"
+                href="https://www.npmjs.com/package/react-gallimaps"
+                target="_blank"
+                rel="noreferrer"
+                >View on npm <span aria-hidden="true">↗</span></a
+              >
+              <a
+                class="text-link"
+                href="https://github.com/rudalkunwar/react-gallimaps"
+                target="_blank"
+                rel="noreferrer"
+                >Source and issues <span aria-hidden="true">↗</span></a
+              >
+            </div>
+          </div>
+
+          <div class="cta-card" data-reveal style="--d: 80ms">
+            <p class="cta-card-label">One line, no peer dependencies</p>
+
+            <div class="install-line install-large">
+              <code id="cta-command">npm install react-gallimaps</code>
+              <button class="copy" type="button" data-copy="#cta-command">
+                Copy
+              </button>
+            </div>
+
+            <dl class="cta-facts">
+              <div>
+                <dt>Version</dt>
+                <dd>2.2.0</dd>
+              </div>
+              <div>
+                <dt>License</dt>
+                <dd>MIT</dd>
+              </div>
+              <div>
+                <dt>React</dt>
+                <dd>16.8+</dd>
+              </div>
+              <div>
+                <dt>Runtime deps</dt>
+                <dd>None</dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-grid">
+        <div class="tile tile-statement">
+          <p>
+            A typed React layer for GalliMaps: one provider, four components, five
+            REST endpoints.
+          </p>
+          <p class="tile-small">MIT licensed. Built by Rudal Kunwar.</p>
+        </div>
+
+        <div class="tile">
+          <nav class="tile-nav" aria-label="Footer">
+            <a href="#guide">Guide</a>
+            <a href="#reference">Reference</a>
+            <a href="#faq">FAQ</a>
+            <a
+              href="https://github.com/rudalkunwar/react-gallimaps/blob/master/CHANGELOG.md"
+              target="_blank"
+              rel="noreferrer"
+              >Changelog</a
+            >
+            <a
+              href="https://github.com/rudalkunwar/react-gallimaps"
+              target="_blank"
+              rel="noreferrer"
+              >GitHub</a
+            >
+          </nav>
+        </div>
+
+        <div class="tile tile-city">
+          <p>Kathmandu, Nepal</p>
+          <p class="local-time" id="local-time">—</p>
+          <p class="tile-small">Asia/Kathmandu</p>
+        </div>
+
+        <div class="tile tile-contact">
+          <p class="tile-label">Issues and ideas</p>
+          <a
+            href="https://github.com/rudalkunwar/react-gallimaps/issues"
+            target="_blank"
+            rel="noreferrer"
+            >GitHub issues ↗</a
+          >
+        </div>
+
+        <a class="tile tile-mark" href="#top" aria-label="Back to top">
+          react-gallimaps
+        </a>
+
+        <a class="tile tile-cta" href="#install">
+          <span>Install the package</span>
+        </a>
+      </div>
+
+      <div class="footer-base">
+        <p>
+          © <span id="year">2026</span> Rudal Kunwar. Photos are credited in the
+          <a href="#photo-credits">Built for Nepal section</a>.
+        </p>
+        <p>
+          GalliMaps is a separate product. This package is an unofficial React
+          binding.
+        </p>
+      </div>
+    </footer>
+
+    <script src="./app.js" defer></script>
+  </body>
+</html>

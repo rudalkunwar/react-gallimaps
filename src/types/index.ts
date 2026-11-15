@@ -60,14 +60,40 @@ export interface GalliPolygonOptions {
   };
 }
 
+/**
+ * The subset of the MapLibre view API exposed by the GalliMaps plugin instance.
+ * The plugin keeps its MapLibre map on a `map` field; using it lets the wrapper
+ * snapshot and restore the viewport without relying on undocumented plugin
+ * methods.
+ */
+export interface GalliMapView {
+  getCenter?: () => { lat: number; lng: number };
+  getZoom?: () => number;
+  jumpTo?: (options: { center?: { lat: number; lng: number }; zoom?: number }) => void;
+  stop?: () => void;
+}
+
+/** The MapLibre marker returned by `displayPinMarker`. */
+export interface GalliMapMarker {
+  getElement?: () => Element | null;
+}
+
 /** The instance returned by `new window.GalliMapPlugin(options)`. */
 export interface GalliMapPlugin {
+  /** MapLibre view, used to restore the viewport after the plugin's `flyTo`. */
+  map?: GalliMapView;
   displayPinMarker: (options: GalliMarkerOptions) => unknown;
   removePinMarker: (marker: unknown) => void;
-  autoCompleteSearch: (searchText: string) => Promise<unknown>;
+  autoCompleteSearch: (
+    searchText: string,
+    lat?: number,
+    lng?: number,
+  ) => Promise<unknown>;
   searchData: (searchText: string) => Promise<unknown>;
   drawPolygon: (options: GalliPolygonOptions) => unknown;
   removePolygon: (name: string) => void;
+  /** Remove the map and release its DOM/WebGL resources. */
+  destroy?: () => void;
   getCenter?: () => [number, number];
   setCenter?: (center: [number, number]) => void;
 }

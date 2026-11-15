@@ -4,6 +4,56 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0]
+
+A reliability release: every open bug fix for the map components and the REST
+client, plus an accessible search box and an honest React 16.8 build. Existing
+APIs are unchanged; the new `<Search>` props are optional.
+
+### Added
+
+- **`<Search>` is now an accessible combobox.** Arrow keys move through
+  results, Enter selects, Escape closes, and the input exposes
+  `aria-expanded`, `aria-controls`, and `aria-activedescendant`. Errors render
+  in a `role="alert"` element.
+- **`<Search>` props `onError` and `ariaLabel`.** `onError` receives
+  autocomplete or selection failures; `ariaLabel` names the input (defaults to
+  "Search locations").
+- **`<Search>` uses its `lat`/`lng` props in map-plugin mode too**, so
+  proximity ordering works with or without a REST client.
+- **`GalliMapView` and `GalliMapMarker` types** for the parts of the MapLibre
+  API the wrapper uses.
+
+### Fixed
+
+- **Stale autocomplete results.** Each search carries a request id, and REST
+  requests are aborted when a newer search starts, a result is selected, or the
+  component unmounts. A slow older response can no longer replace a newer one.
+- **Map instances leak on token changes.** Changing `accessToken` now destroys
+  the previous plugin instance (canvas, controls, WebGL resources) before
+  creating the next one; unmount also releases it.
+- **Nested `route()` / `distance()` errors lose their metadata.** Failures
+  reported inside the inner GalliMaps envelope now keep the HTTP `status`, the
+  token-redacted `url`, and the response body.
+- **Overlays render at swapped coordinates.** `Polygon`, `LineString`, and
+  `Point` now convert the public `[lat, lng]` pairs to GeoJSON `[lng, lat]`
+  before calling the plugin.
+- **Adding markers hijacked the viewport.** The plugin's `displayPinMarker()`
+  always flies to the new pin at zoom 20. The wrapper now cancels that animation
+  through the plugin's MapLibre view and restores the previous center and zoom.
+- **`Marker.onClick` missed the visible pin.** Clicks are now handled on the
+  marker element itself, so the whole pin is clickable at any zoom. The
+  map-proximity lookup remains as a fallback. A new `onClick` handler no longer
+  recreates the marker.
+- **React 16.8 consumers failed at import time.** The build compiles JSX with
+  the classic runtime, so it no longer imports `react/jsx-runtime` (React
+  16.14+). CI now imports the built package with React 16.8.6.
+
+### Changed
+
+- CI runs the full lint, format, type-check, test, and build pipeline on Node
+  18, 20, and 22, plus a minimum-React import smoke test.
+
 ## [2.1.0]
 
 Adds first-class support for the five officially documented GalliMaps REST

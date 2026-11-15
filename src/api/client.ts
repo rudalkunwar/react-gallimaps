@@ -43,6 +43,14 @@ export interface GalliApiClientOptions {
 
 type QueryValue = string | number | undefined | null;
 
+/** Envelope plus the response metadata needed for rich errors. */
+interface ApiResponse<T> {
+  envelope: GalliApiEnvelope<T>;
+  status: number;
+  /** Request URL with the access token redacted. */
+  url: string;
+}
+
 /**
  * Typed client for the five officially documented GalliMaps REST APIs:
  * autocomplete, search, reverse geocoding, routing, and distance.
@@ -89,7 +97,7 @@ export class GalliApiClient {
       { word: params.word, lat: params.lat, lng: params.lng },
       options,
     );
-    return Array.isArray(res.data) ? res.data : [];
+    return Array.isArray(res.envelope.data) ? res.envelope.data : [];
   }
 
   /** Full search relative to a current location; returns a GeoJSON collection. */
@@ -106,7 +114,7 @@ export class GalliApiClient {
       },
       options,
     );
-    return res.data;
+    return res.envelope.data;
   }
 
   /** Reverse-geocode a coordinate pair into an address. */
@@ -119,7 +127,7 @@ export class GalliApiClient {
       { lat: params.lat, lng: params.lng },
       options,
     );
-    return res.data;
+    return res.envelope.data;
   }
 
   /** Compute one or more routes between a source and destination. */
@@ -129,7 +137,7 @@ export class GalliApiClient {
       this.routingQuery(params),
       options,
     );
-    return this.unwrapNested(res, "route");
+    return this.unwrapNested(res.envelope, "route", res);
   }
 
   /** Distance + duration only (no geometry) between two points. */
@@ -142,7 +150,7 @@ export class GalliApiClient {
       this.routingQuery(params),
       options,
     );
-    return this.unwrapNested(res, "distance");
+    return this.unwrapNested(res.envelope, "distance", res);
   }
 
   /* -------------------------------- internals -------------------------------- */
@@ -160,12 +168,13 @@ export class GalliApiClient {
   private unwrapNested<T>(
     res: GalliApiEnvelope<GalliApiEnvelope<T[]>>,
     label: string,
-    redactedUrl?: string,
+    meta: Pick<ApiResponse<unknown>, "url" | "status">,
   ): T[] {
     const inner = res.data;
     if (inner && inner.success === false) {
       throw new GalliApiError(inner.message || `GalliMaps ${label} was unsuccessful.`, {
-        url: redactedUrl,
+        status: meta.status,
+        url: meta.url,
         body: res,
       });
     }
@@ -192,7 +201,7 @@ export class GalliApiClient {
     path: string,
     params: Record<string, QueryValue>,
     options?: RequestOptions,
-  ): Promise<GalliApiEnvelope<T>> {
+  ): Promise<ApiResponse<T>> {
     const url = this.buildUrl(path, params);
     const safeUrl = this.redact(url);
 
@@ -250,6 +259,6 @@ export class GalliApiClient {
       });
     }
 
-    return envelope;
+    return { envelope, status: response.status, url: safeUrl };
   }
 }

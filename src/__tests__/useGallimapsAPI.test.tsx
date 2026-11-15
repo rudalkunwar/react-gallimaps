@@ -10,7 +10,7 @@ const createFakePlugin = () => {
     displayPinMarker: [] as GalliMarkerOptions[],
     drawPolygon: [] as GalliPolygonOptions[],
     removePolygon: [] as string[],
-    autoComplete: [] as string[],
+    autoComplete: [] as Array<{ text: string; lat?: number; lng?: number }>,
   };
   const plugin: GalliMapPlugin = {
     displayPinMarker: (opts) => {
@@ -23,8 +23,8 @@ const createFakePlugin = () => {
       return { id: "polygon" };
     },
     removePolygon: (name) => calls.removePolygon.push(name),
-    autoCompleteSearch: async (text) => {
-      calls.autoComplete.push(text);
+    autoCompleteSearch: async (text, lat, lng) => {
+      calls.autoComplete.push({ text, lat, lng });
       return [{ name: "Kathmandu" }];
     },
     searchData: async () => ({ ok: true }),
@@ -91,6 +91,23 @@ describe("useGallimapsAPI", () => {
     jest.useRealTimers();
   });
 
+  it("restores the viewport after the plugin flies to a new marker", () => {
+    const { api, ctx } = setup();
+    const { plugin } = createFakePlugin();
+    const center = { lat: 27.7172, lng: 85.324 };
+    const stop = jest.fn();
+    const jumpTo = jest.fn();
+    plugin.map = { getCenter: () => center, getZoom: () => 14, stop, jumpTo };
+    act(() => ctx.current!.setMapInstance(plugin));
+
+    act(() => {
+      api.current!.displayPinMarker({ position: [27.6736, 85.325] });
+    });
+
+    expect(stop).toHaveBeenCalledTimes(1);
+    expect(jumpTo).toHaveBeenCalledWith({ center, zoom: 14 });
+  });
+
   it("wraps polygon coordinates in GeoJSON and applies style defaults", () => {
     const { api, ctx } = setup();
     const { plugin, calls } = createFakePlugin();
@@ -113,10 +130,38 @@ describe("useGallimapsAPI", () => {
     expect(drawn.geoJson.geometry.type).toBe("Polygon");
     expect(drawn.geoJson.geometry.coordinates).toEqual([
       [
-        [27.7, 85.3],
-        [27.71, 85.31],
+        [85.3, 27.7],
+        [85.31, 27.71],
       ],
     ]);
+  });
+
+  it("converts LineString and Point coordinates to GeoJSON lng/lat order", () => {
+    const { api, ctx } = setup();
+    const { plugin, calls } = createFakePlugin();
+    act(() => ctx.current!.setMapInstance(plugin));
+
+    act(() => {
+      api.current!.drawPolygon({
+        name: "line",
+        type: "LineString",
+        coordinates: [
+          [27.7, 85.3],
+          [27.71, 85.31],
+        ],
+      });
+      api.current!.drawPolygon({
+        name: "point",
+        type: "Point",
+        coordinates: [[27.7, 85.3]],
+      });
+    });
+
+    expect(calls.drawPolygon[0].geoJson.geometry.coordinates).toEqual([
+      [85.3, 27.7],
+      [85.31, 27.71],
+    ]);
+    expect(calls.drawPolygon[1].geoJson.geometry.coordinates).toEqual([85.3, 27.7]);
   });
 
   it("returns only array results from autocomplete", async () => {
@@ -127,5 +172,15 @@ describe("useGallimapsAPI", () => {
     const results = await api.current!.autoCompleteSearch("kat");
     expect(results).toEqual([{ name: "Kathmandu" }]);
     expect(api.current!.isReady).toBe(true);
+  });
+
+  it("forwards optional coordinates to the plugin autocomplete", async () => {
+    const { api, ctx } = setup();
+    const { plugin, calls } = createFakePlugin();
+    act(() => ctx.current!.setMapInstance(plugin));
+
+    await api.current!.autoCompleteSearch("pok", 28.2096, 83.9856);
+
+    expect(calls.autoComplete).toEqual([{ text: "pok", lat: 28.2096, lng: 83.9856 }]);
   });
 });

@@ -4,13 +4,16 @@
 [![CI](https://github.com/rudalkunwar/react-gallimaps/actions/workflows/ci.yml/badge.svg)](https://github.com/rudalkunwar/react-gallimaps/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](./CONTRIBUTING.md)
+[![Docs](https://img.shields.io/badge/docs-react--gallimaps-blue.svg)](https://rudalkunwar.github.io/react-gallimaps/)
 
 Type-safe React bindings for [GalliMaps](https://gallimap.com/) — Nepal's mapping solution. Two things in one package:
 
 1. **Map components** — declarative `<Gallimap>`, `<Marker>`, `<Polygon>`, `<Search>` around the GalliMaps Vector Plugin.
 2. **REST API client + hooks** — a typed `GalliApiClient` and hooks (`useAutocomplete`, `useSearch`, `useReverseGeocode`, `useRoute`, `useDistance`) for the five officially documented GalliMaps REST APIs. These work with **React, Next.js, and React Native** — no rendered map required.
 
-> **New in 2.1.0:** the REST API client + hooks, plus a fix for a map re-initialization loop. See the [changelog](./CHANGELOG.md).
+**Documentation:** [rudalkunwar.github.io/react-gallimaps](https://rudalkunwar.github.io/react-gallimaps/) — setup, every prop and hook, and copy-ready examples.
+
+> **New in 2.2.0:** accessible search, stale-response and map-cleanup fixes, correct overlay coordinates, marker clicks that match the pin, and a real React 16.8 build. See the [changelog](./CHANGELOG.md).
 
 ## Features
 
@@ -191,14 +194,21 @@ Marker ids are generated automatically — you no longer pass a `markerId`.
 | ------------- | --------------------------------- | --------------------- | --------------------------------- |
 | `onSelect`    | `(result: SearchResult) => void`  | —                     | Called when a result is selected. |
 | `onResults`   | `(results: SearchResult[]) => void` | —                   | Called when autocomplete updates. |
+| `onError`     | `(error: Error) => void`          | —                     | Called when autocomplete or result selection fails. |
 | `placeholder` | `string`                          | `"Search locations…"` | Input placeholder.                |
+| `ariaLabel`   | `string`                          | `"Search locations"`  | Accessible name for the combobox input. |
 | `className`   | `string`                          | —                     | Extra class on the wrapper.       |
-| `lat` / `lng` | `number`                          | —                     | When provided with a REST client (via `GallimapsProvider accessToken`), uses the REST autocomplete/search APIs and works without a rendered map. Otherwise falls back to the map plugin. |
+| `lat` / `lng` | `number`                          | —                     | Proximity coordinates for autocomplete. With a REST client (via `GallimapsProvider accessToken`) they enable the REST autocomplete/search APIs and a map-free search box. Without a client, they are passed to the map plugin's `autoCompleteSearch`. |
 
 ```tsx
 // Map-free search backed by the REST API (needs `accessToken` on the provider):
 <Search lat={27.7172} lng={85.324} onSelect={(r) => console.log(r)} />
 ```
+
+The input follows the ARIA combobox pattern. Users can navigate results with
+ArrowUp/ArrowDown and select with Enter; Escape clears the list. Autocomplete
+errors are rendered in `.gallimap-search-error` and reported through `onError`;
+stale responses are ignored.
 
 ## Hooks
 
@@ -224,6 +234,9 @@ const {
   isReady,
 } = useGallimapsAPI();
 ```
+
+`autoCompleteSearch(searchText, lat?, lng?)` accepts optional proximity
+coordinates; when omitted, the plugin uses its own defaults.
 
 ### `useScript(src)`
 
@@ -418,7 +431,7 @@ export default function App() {
 The components ship unstyled with stable class names you can target:
 
 - Map: `.gallimap-container`, `.gallimap`, `.gallimap-pano`, `.gallimap-share`, `.gallimap-loading`, `.gallimap-error`
-- Search: `.gallimap-search`, `.gallimap-search-input`, `.gallimap-search-results`, `.gallimap-search-result`, `.gallimap-search-loading`
+- Search: `.gallimap-search`, `.gallimap-search-input`, `.gallimap-search-results`, `.gallimap-search-result`, `.gallimap-search-result-active`, `.gallimap-search-loading`, `.gallimap-search-error`
 
 ```css
 .gallimap {
