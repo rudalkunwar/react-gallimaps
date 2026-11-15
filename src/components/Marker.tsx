@@ -25,7 +25,7 @@ const Marker = ({ position, draggable, color, onClick }: MarkerProps): null => {
   const listenerRef = useRef<MarkerElementListener | null>(null);
   const onClickRef = useRef(onClick);
   onClickRef.current = onClick;
-  const idRef = useRef<string>();
+  const idRef = useRef<string | null>(null);
   if (!idRef.current) {
     idRef.current = `gallimap-marker-${++markerCounter}`;
   }
