@@ -9,6 +9,13 @@ Only the latest published major version receives security updates.
 | 2.x     | Yes       |
 | < 2.0   | No        |
 
+## Dependencies
+
+The published package has no runtime dependencies besides its React peers. The
+runtime audit is kept at zero known advisories (`npm audit --omit=dev`); issues
+that only affect build or test tooling are tracked separately and do not ship in
+the package.
+
 ## Reporting a Vulnerability
 
 Please **do not** open a public issue for security vulnerabilities.

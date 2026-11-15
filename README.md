@@ -14,6 +14,8 @@ Type-safe React bindings for [GalliMaps](https://gallimap.com/) — Nepal's mapp
 **Documentation:** [rudalkunwar.github.io/react-gallimaps](https://rudalkunwar.github.io/react-gallimaps/) — setup, every prop and hook, and copy-ready examples.
 
 > **New in 2.2.0:** accessible search, stale-response and map-cleanup fixes, correct overlay coordinates, marker clicks that match the pin, and a real React 16.8 build. See the [changelog](./CHANGELOG.md).
+>
+> 2.2.0 is a drop-in upgrade from 2.1.x. Existing props and hook signatures are unchanged; the new `<Search>` props are optional.
 
 ## Features
 
@@ -35,9 +37,9 @@ npm install react react-dom
 
 ## Requirements
 
-- React **16.8+** (hooks) — React 18 recommended.
+- React **16.8+** (hooks). CI imports the built package against React 16.8; development and tests run React 19.
 - A **real GalliMaps access token** ([get one here](https://gallimap.com/)). Placeholder tokens will not load tiles or search results.
-- A browser environment (SSR guards are built in; render client-side).
+- A browser environment for the map components (SSR guards are built in; render client-side). The REST client and hooks also run in Node 18+ and React Native.
 
 ## Quick start
 
@@ -61,7 +63,7 @@ export default function App() {
 
 ### Markers, polygons, and search
 
-Add children to the map. `Marker.onClick` requires `clickable` on `<Gallimap>`:
+Add children to the map. `Marker.onClick` fires from the pin itself, so `clickable` is only needed for map-level click events:
 
 ```tsx
 import {
@@ -75,7 +77,7 @@ import {
 export default function App() {
   return (
     <GallimapsProvider>
-      <Gallimap accessToken="YOUR_TOKEN" center={[27.7172, 85.324]} zoom={13} clickable>
+      <Gallimap accessToken="YOUR_TOKEN" center={[27.7172, 85.324]} zoom={13}>
         <Marker
           position={[27.7172, 85.324]}
           color="red"
@@ -149,7 +151,7 @@ the shared map instance, the marker registry, and (optionally) a REST client.
 | `center`               | `[number, number]`                        | `[27.7172,85.324]` | Initial `[lat, lng]` (defaults to Kathmandu).        |
 | `zoom`                 | `number`                                  | `15`               | Initial zoom.                                        |
 | `minZoom` / `maxZoom`  | `number`                                  | `5` / `25`         | Zoom bounds.                                         |
-| `clickable`            | `boolean`                                 | `false`            | Enables map click events (needed for marker clicks). |
+| `clickable`            | `boolean`                                 | `false`            | Enables map click events; pin clicks work without it. |
 | `mapOptions`           | `Partial<MapOptions>`                     | —                  | Override any of the above via the native `map` shape.|
 | `pano`                 | `boolean`                                 | `false`            | Render a panorama container.                         |
 | `panoId` / `shareId`   | `string`                                  | auto               | Custom DOM ids / enable the share container.         |
@@ -164,9 +166,10 @@ against SSR (returns `null` server-side), and shows simple loading/error states.
 The map initializes **once** per mount — passing inline props (e.g. a `center`
 array literal or an inline `onMapInit`) will not re-create the map. A `pano`
 container is always mounted (hidden unless `pano`/`panoId` is set) because the
-plugin requires one. In React 18 StrictMode (dev only), effects run twice, so
-the map may initialize twice during development; this does not happen in
-production builds.
+plugin requires one. Changing `accessToken` destroys the previous plugin
+instance before creating the next one. In React 18/19 StrictMode (dev only),
+effects run twice; the cleanup releases the first instance, so the second mount
+starts clean. This does not happen in production builds.
 
 ### `<Marker>`
 
@@ -175,7 +178,7 @@ production builds.
 | `position`  | `[number, number]`         | `[lat, lng]` (required).                           |
 | `color`     | `string`                   | Pin color.                                         |
 | `draggable` | `boolean`                  | Allow dragging.                                    |
-| `onClick`   | `(marker: MarkerData) => void` | Fired when the marker is clicked (needs `clickable`). |
+| `onClick`   | `(marker: MarkerData) => void` | Fired when the visible pin is clicked. `clickable` is not required for pin clicks. |
 
 Marker ids are generated automatically — you no longer pass a `markerId`.
 
@@ -202,13 +205,21 @@ Marker ids are generated automatically — you no longer pass a `markerId`.
 
 ```tsx
 // Map-free search backed by the REST API (needs `accessToken` on the provider):
-<Search lat={27.7172} lng={85.324} onSelect={(r) => console.log(r)} />
+<Search
+  lat={27.7172}
+  lng={85.324}
+  ariaLabel="Search places in Kathmandu"
+  onSelect={(result) => console.log(result)}
+  onError={(error) => console.error("Search failed", error)}
+/>
 ```
 
 The input follows the ARIA combobox pattern. Users can navigate results with
 ArrowUp/ArrowDown and select with Enter; Escape clears the list. Autocomplete
-errors are rendered in `.gallimap-search-error` and reported through `onError`;
-stale responses are ignored.
+and selection errors are rendered in a `role="alert"` element with the
+`.gallimap-search-error` class and reported through `onError`. Each search
+carries a request id, and superseded REST requests are aborted, so a slow older
+response cannot replace a newer one.
 
 ## Hooks
 
@@ -447,10 +458,12 @@ The components ship unstyled with stable class names you can target:
 
 - **Map doesn't render in Next.js:** ensure the component is client-side (`"use client"`) and/or use `ssr: false` dynamic import.
 - **Script load errors:** confirm network access to `https://gallimap.com/static/dist/js/gallimaps.vector.min.latest.js` and a valid `accessToken`.
-- **Marker `onClick` not firing:** set `clickable` on `<Gallimap>`.
-- **Markers move the map:** the wrapper restores the map center after adding markers when the plugin exposes `getCenter`/`setCenter`.
+- **Marker `onClick` not firing:** pin clicks are handled directly by the marker element. If you rely on the map-proximity fallback, set `clickable` on `<Gallimap>`.
+- **Markers move the map:** fixed in 2.2.0 — the plugin's `flyTo` on pin creation is cancelled and the previous center/zoom is restored. Upgrade.
+- **Stale search results:** fixed in 2.2.0 — each search carries a request id, and superseded REST requests are aborted.
 - **`No GalliMaps REST client found`:** you called a REST hook (`useAutocomplete`, `useRoute`, ...) without giving the provider an `accessToken` (or `client`). Add it: `<GallimapsProvider accessToken="...">`.
 - **Repeated `Map ready` / `THREE.WebGLRenderer: Context Lost`:** fixed in 2.1.0 — upgrade. The map no longer re-initializes when inline props change identity.
+- **Old map still rendering after a token change:** fixed in 2.2.0 — the previous plugin instance is destroyed before the next one is created.
 
 ## Migrating from v1
 
