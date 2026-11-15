@@ -64,7 +64,11 @@ export interface GalliPolygonOptions {
 export interface GalliMapPlugin {
   displayPinMarker: (options: GalliMarkerOptions) => unknown;
   removePinMarker: (marker: unknown) => void;
-  autoCompleteSearch: (searchText: string) => Promise<unknown>;
+  autoCompleteSearch: (
+    searchText: string,
+    lat?: number,
+    lng?: number,
+  ) => Promise<unknown>;
   searchData: (searchText: string) => Promise<unknown>;
   drawPolygon: (options: GalliPolygonOptions) => unknown;
   removePolygon: (name: string) => void;

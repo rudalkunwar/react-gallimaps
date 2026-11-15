@@ -24,7 +24,11 @@ export interface PolygonOptions {
 export interface GallimapsAPIHook {
   displayPinMarker: (options: MarkerOptions) => unknown;
   removePinMarker: (marker: unknown) => void;
-  autoCompleteSearch: (searchText: string) => Promise<unknown[]>;
+  autoCompleteSearch: (
+    searchText: string,
+    lat?: number,
+    lng?: number,
+  ) => Promise<unknown[]>;
   searchData: (searchText: string) => Promise<unknown>;
   drawPolygon: (options: PolygonOptions) => unknown;
   removePolygon: (name: string) => void;
@@ -51,13 +55,17 @@ export interface SearchProps {
   onSelect?: (result: SearchResult) => void;
   /** Called whenever the list of autocomplete results updates. */
   onResults?: (results: SearchResult[]) => void;
+  /** Called when autocomplete or result selection fails. */
+  onError?: (error: Error) => void;
   placeholder?: string;
+  /** Accessible name for the combobox input. Defaults to "Search locations". */
+  ariaLabel?: string;
   className?: string;
   /**
-   * Latitude used for proximity ordering. When provided together with `lng`
-   * and a REST client (via `<GallimapsProvider accessToken>`), the component
-   * uses the REST autocomplete API and works without a rendered map. Otherwise
-   * it falls back to the map plugin's search.
+   * Latitude used for proximity ordering in both REST mode and the map-plugin
+   * fallback. When provided together with `lng` and a REST client (via
+   * `<GallimapsProvider accessToken>`), the component uses the REST
+   * autocomplete API and works without a rendered map.
    */
   lat?: number;
   /** Longitude counterpart to {@link SearchProps.lat}. */
