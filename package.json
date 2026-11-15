@@ -1,6 +1,6 @@
 {
   "name": "react-gallimaps",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "React bindings for GalliMaps (Nepal) - map components plus typed hooks for the Search, Autocomplete, Reverse Geocoding, Routing, and Distance REST APIs",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -30,7 +30,7 @@
     "type": "git",
     "url": "git+https://github.com/rudalkunwar/react-gallimaps.git"
   },
-  "homepage": "https://github.com/rudalkunwar/react-gallimaps#readme",
+  "homepage": "https://rudalkunwar.github.io/react-gallimaps/",
   "bugs": {
     "url": "https://github.com/rudalkunwar/react-gallimaps/issues"
   },

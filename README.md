@@ -4,13 +4,16 @@
 [![CI](https://github.com/rudalkunwar/react-gallimaps/actions/workflows/ci.yml/badge.svg)](https://github.com/rudalkunwar/react-gallimaps/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](./CONTRIBUTING.md)
+[![Docs](https://img.shields.io/badge/docs-react--gallimaps-blue.svg)](https://rudalkunwar.github.io/react-gallimaps/)
 
 Type-safe React bindings for [GalliMaps](https://gallimap.com/) — Nepal's mapping solution. Two things in one package:
 
 1. **Map components** — declarative `<Gallimap>`, `<Marker>`, `<Polygon>`, `<Search>` around the GalliMaps Vector Plugin.
 2. **REST API client + hooks** — a typed `GalliApiClient` and hooks (`useAutocomplete`, `useSearch`, `useReverseGeocode`, `useRoute`, `useDistance`) for the five officially documented GalliMaps REST APIs. These work with **React, Next.js, and React Native** — no rendered map required.
 
-> **New in 2.1.0:** the REST API client + hooks, plus a fix for a map re-initialization loop. See the [changelog](./CHANGELOG.md).
+**Documentation:** [rudalkunwar.github.io/react-gallimaps](https://rudalkunwar.github.io/react-gallimaps/) — setup, every prop and hook, and copy-ready examples.
+
+> **New in 2.2.0:** accessible search, stale-response and map-cleanup fixes, correct overlay coordinates, marker clicks that match the pin, and a real React 16.8 build. See the [changelog](./CHANGELOG.md).
 
 ## Features
 
