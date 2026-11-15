@@ -8,6 +8,23 @@ updates:
     groups:
       dev-dependencies:
         dependency-type: development
+    ignore:
+      # eslint-plugin-react 7.x (latest) does not support ESLint 10.
+      - dependency-name: "eslint"
+        update-types:
+          - "version-update:semver-major"
+      # ts-jest 29.x peers typescript <7.
+      - dependency-name: "typescript"
+        update-types:
+          - "version-update:semver-major"
+      # tsup 9 requires Node 22; the package supports Node 18.
+      - dependency-name: "tsup"
+        update-types:
+          - "version-update:semver-major"
+      # jest-dom 6.10 and 7 require Node 22.
+      - dependency-name: "@testing-library/jest-dom"
+        versions:
+          - ">= 6.10.0"
     labels:
       - dependencies
 
