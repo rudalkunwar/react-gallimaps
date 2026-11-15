@@ -24,7 +24,11 @@ export default tseslint.config(
       react: { version: "detect" },
     },
     rules: {
-      ...reactHooks.configs.recommended.rules,
+      // The classic rules only. v7's recommended preset enables the React
+      // Compiler rules, which do not apply to a library that supports React
+      // 16.8 and uses refs in ways the compiler cannot model.
+      "react-hooks/rules-of-hooks": "error",
+      "react-hooks/exhaustive-deps": "warn",
       "react/jsx-uses-react": "error",
       "react/react-in-jsx-scope": "off",
       "react/prop-types": "off",
