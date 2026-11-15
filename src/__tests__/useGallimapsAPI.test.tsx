@@ -91,6 +91,23 @@ describe("useGallimapsAPI", () => {
     jest.useRealTimers();
   });
 
+  it("restores the viewport after the plugin flies to a new marker", () => {
+    const { api, ctx } = setup();
+    const { plugin } = createFakePlugin();
+    const center = { lat: 27.7172, lng: 85.324 };
+    const stop = jest.fn();
+    const jumpTo = jest.fn();
+    plugin.map = { getCenter: () => center, getZoom: () => 14, stop, jumpTo };
+    act(() => ctx.current!.setMapInstance(plugin));
+
+    act(() => {
+      api.current!.displayPinMarker({ position: [27.6736, 85.325] });
+    });
+
+    expect(stop).toHaveBeenCalledTimes(1);
+    expect(jumpTo).toHaveBeenCalledWith({ center, zoom: 14 });
+  });
+
   it("wraps polygon coordinates in GeoJSON and applies style defaults", () => {
     const { api, ctx } = setup();
     const { plugin, calls } = createFakePlugin();
