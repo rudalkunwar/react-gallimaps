@@ -110,6 +110,56 @@ describe("GalliApiClient", () => {
     expect(data).toEqual([{ distance: 5, duration: 3 }]);
   });
 
+  it("attaches the redacted URL and status to nested route errors", async () => {
+    const inner = { success: false, message: "No route", data: [] };
+    const outer = { success: true, message: "Routing", data: inner };
+    const { fn } = mockFetch(outer);
+    const client = new GalliApiClient({ accessToken: TOKEN, fetch: fn });
+
+    try {
+      await client.route({
+        mode: "driving",
+        srcLat: 1,
+        srcLng: 2,
+        dstLat: 3,
+        dstLng: 4,
+      });
+      throw new Error("should have thrown");
+    } catch (err) {
+      expect(isGalliApiError(err)).toBe(true);
+      const apiErr = err as GalliApiError;
+      expect(apiErr.message).toBe("No route");
+      expect(apiErr.status).toBe(200);
+      expect(apiErr.url).toContain("accessToken=[REDACTED]");
+      expect(apiErr.url).not.toContain(TOKEN);
+      expect(apiErr.body).toEqual(outer);
+    }
+  });
+
+  it("attaches the redacted URL and status to nested distance errors", async () => {
+    const inner = { success: false, message: "No distance", data: [] };
+    const outer = { success: true, message: "Distance", data: inner };
+    const { fn } = mockFetch(outer);
+    const client = new GalliApiClient({ accessToken: TOKEN, fetch: fn });
+
+    try {
+      await client.distance({
+        mode: "walking",
+        srcLat: 1,
+        srcLng: 2,
+        dstLat: 3,
+        dstLng: 4,
+      });
+      throw new Error("should have thrown");
+    } catch (err) {
+      expect(isGalliApiError(err)).toBe(true);
+      const apiErr = err as GalliApiError;
+      expect(apiErr.status).toBe(200);
+      expect(apiErr.url).toContain("accessToken=[REDACTED]");
+      expect(apiErr.body).toEqual(outer);
+    }
+  });
+
   it("throws GalliApiError on a non-2xx response", async () => {
     const { fn } = mockFetch(
       { success: false, message: "Unauthorized" },
